@@ -25,6 +25,7 @@ body {
 .canvas {
   @include box-sizing(border-box);
   background: $color-white;
+  line-height: 1;
   font-family: "Inconsolata", Menlo, sans-serif;
   font-size: 2em;
   width: 100%;
@@ -34,11 +35,9 @@ body {
 
   .character {
     @include inline-block;
+    position: relative;
+    z-index: 1;
   }
-}
-.character {
-  position: relative;
-  z-index: 1;
 }
 
 //------------------------------------------------------------------------
@@ -50,19 +49,19 @@ body {
   100% { @include opacity(1); }
 }
 @-webkit-keyframes shake {
-  0%   { margin-left: -2px; }
-  25%  { margin-left:  2px; }
-  50%  { margin-left: -2px; }
-  75%  { margin-left:  2px; }
-  100% { margin-left:    0; }
+  0%   { left: -2px; }
+  25%  { left:  2px; }
+  50%  { left: -2px; }
+  75%  { left:  2px; }
+  100% { left:  0px; }
 }
 .cursor {
   @include inline-block;
   background: $color-ocean-blue;
   width: 5px;
-  height: 25px;
-  position: absolute;
+  position: relative;
   z-index: 0;
+  margin-right: -5px; // mirror width
   -webkit-animation: phase 1s linear infinite;
 
   &.error {

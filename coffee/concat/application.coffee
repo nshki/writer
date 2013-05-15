@@ -3,53 +3,96 @@
 #========================================================================
 
 #------------------------------------------------------------------------
-# Constants
-#------------------------------------------------------------------------
-
-#------------------------------------------------------------------------
 # Helper Functions
 #------------------------------------------------------------------------
+get_char_height = () ->
+  # Create new blank character
+  canvas         = document.querySelector(".canvas")
+  char           = document.createElement("div")
+  char.className = "character"
+  char.innerHTML = "&nbsp;"
+  canvas.appendChild(char)
+
+  # Calculate total box model height
+  char_comp   = document.defaultView.getComputedStyle(char, "")
+  char_height = char.offsetHeight +
+                parseInt(char_comp.getPropertyValue("margin-top")) +
+                parseInt(char_comp.getPropertyValue("margin-bottom"))
+
+  # Remove blank character and return the height
+  canvas.removeChild(char)
+  char_height
 
 #------------------------------------------------------------------------
-# Classes
+# Cursor controls the behavior of the blinking I-beam. Any typing or
+# action keys / shortcuts respond to the methods defined by this class.
 #------------------------------------------------------------------------
 class Cursor
+
   # Default constructor
+  #----------------------------------------------------------------------
   constructor: (@el) ->
-    @el.style.top     = "50px"    # mirror .canvas padding-top
-    @el.style.left    = "100px"   # mirror .canvas padding-left
+    @el.style.height  = get_char_height() + "px"
     @pos              = 0
-    @char_count       = 0
     window.onkeydown  = @keydown_listener
     window.onkeypress = @keypress_listener
 
   # Setter methods to link DOM elements
-  set_canvas:       (@canvas)       ->
-  set_char_counter: (@char_counter) ->
+  #----------------------------------------------------------------------
+  set_canvas: (@canvas) ->
 
-  # Move cursor left
-  move_left: (dist) =>
-    new_left       = parseInt(@el.style.left) - dist
-    @el.style.left = new_left + "px"
-    @pos -= 1
+  # Delete character located left of cursor
+  #----------------------------------------------------------------------
+  delete: (e) =>
+    e.preventDefault()
+    before_cursor = @canvas.children[@pos-1]
 
-  # Move cursor right
-  move_right: (dist) =>
-    new_left       = parseInt(@el.style.left) + dist
-    @el.style.left = new_left + "px"
+    if before_cursor
+      @pos -= 1
+      @canvas.removeChild(before_cursor)
+    else @error()
+
+  # Duplicate standard return / enter behavior
+  #----------------------------------------------------------------------
+  enter: () =>
+    newline           = document.createElement("br")
+    newline.className = "newline"
+    @canvas.insertBefore(newline, @el)
     @pos += 1
 
-  # Increment character count
-  inc_char_count: () =>
-    @char_count += 1
-    @char_counter.innerHTML = @char_count
+  # Move cursor left
+  #----------------------------------------------------------------------
+  move_left: () =>
+    if @pos > 0
+      previous_el = @canvas.children[@pos-1]
+      @pos -= 1
+      @canvas.removeChild(@el)
+      @canvas.insertBefore(@el, previous_el)
+    else @error()
 
-  # Decrement character count
-  dec_char_count: () =>
-    @char_count -= 1
-    @char_counter.innerHTML = @char_count
+  # Move cursor right
+  #----------------------------------------------------------------------
+  move_right: () =>
+    # Using -2 because:
+    #
+    #    | _ _
+    #    0 1 2
+    #
+    # .insertBefore should be on element 2
+    if @pos <= @canvas.children.length-2
+      last_pos     = @pos == @canvas.children.length-2
+      next_next_el = @canvas.children[@pos+2]
+      @pos += 1
+      @canvas.removeChild(@el)
+
+      # If we reached the end of our typing, append the cursor,
+      # otherwise, insert into appropriate location.
+      if last_pos then @canvas.appendChild(@el)
+      else             @canvas.insertBefore(@el, next_next_el)
+    else @error()
 
   # Behavior on error
+  #----------------------------------------------------------------------
   error: () =>
     @el.className = "cursor error"
     el = @el
@@ -58,53 +101,40 @@ class Cursor
     , 500
 
   # Handle action keys
+  #----------------------------------------------------------------------
   keydown_listener: (e) =>
     switch e.which
-      # Backspace (also disable backspace navigation)
-      when 8
-        e.preventDefault()
-        before_cursor = @canvas.children[@pos-1]
-
-        # Handle illegal backspace
-        if before_cursor
-          @move_left(before_cursor.offsetWidth)
-          @canvas.removeChild(before_cursor)
-          @dec_char_count()
-        else @error()
-
-      # Left arrow
-      when 37
-        if @pos > 0
-          previous_el = @canvas.children[@pos-1]
-          @move_left(previous_el.offsetWidth)
-          @canvas.removeChild(@el)
-          @canvas.insertBefore(@el, previous_el)
-        else @error()
-
-      # Right arrow
-      when 39
-        if @pos <= @canvas.children.length-2
-          last_pos     = @pos == @canvas.children.length-2
-          next_el      = @canvas.children[@pos+1]
-          next_next_el = @canvas.children[@pos+2]
-          @move_right(next_el.offsetWidth)
-          @canvas.removeChild(@el)
-
-          # If we reached the end of our typing, append the cursor,
-          # otherwise, insert into appropriate location.
-          if last_pos @canvas.appendChild(@el)
-          else        @canvas.insertBefore(@el, next_next_el)
-        else @error()
+      when 8  then @delete(e)
+      when 37 then @move_left()
+      when 39 then @move_right()
+      when 13 then @enter()
 
   # Handle typed characters
+  #----------------------------------------------------------------------
   keypress_listener: (e) =>
+    return if e.which == 13
     char           = document.createElement("div")
     char.className = "character"
     char.innerHTML = String.fromCharCode(e.which)
     char.innerHTML = "&nbsp;" if char.innerHTML == " "
     @canvas.insertBefore(char, @el)
-    @move_right(char.offsetWidth)
-    @inc_char_count()
+    @pos += 1
+
+#------------------------------------------------------------------------
+# Infopane watches for changes to a given canvas element and updates
+# makes various data available to the user.
+#------------------------------------------------------------------------
+class Infopane
+
+  # Default constructor
+  #----------------------------------------------------------------------
+  constructor: (@canvas) ->
+    @canvas.onchange = @onchange_listener
+
+  # Watches for any changes to the given canvas
+  #----------------------------------------------------------------------
+  onchange_listener: () =>
+    console.log "Change"
 
 #========================================================================
 # main.coffee
@@ -116,6 +146,8 @@ class Cursor
 canvas       = document.querySelector(".canvas")
 char_counter = document.querySelector(".char-counter")
 cursor       = document.querySelector(".cursor")
-cursor       = new Cursor(cursor)
+
+cursor = new Cursor(cursor)
 cursor.set_canvas(canvas)
-cursor.set_char_counter(char_counter)
+
+infopane = new Infopane(canvas)
