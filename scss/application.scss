@@ -1,0 +1,93 @@
+//========================================================================
+// application.scss
+//========================================================================
+
+@import "base";
+@import "media";
+@import "ie";
+
+//------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------
+html, body {
+  height: 100%;
+}
+body {
+  background: $color-white;
+  font-family: $font-face-primary;
+  font-size: $font-size-base;
+  color: $color-black;
+}
+
+//------------------------------------------------------------------------
+// Canvas and characters
+//------------------------------------------------------------------------
+.canvas {
+  @include box-sizing(border-box);
+  background: $color-white;
+  font-family: "Inconsolata", Menlo, sans-serif;
+  font-size: 2em;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 50px 100px;
+
+  .character {
+    @include inline-block;
+  }
+}
+.character {
+  position: relative;
+  z-index: 1;
+}
+
+//------------------------------------------------------------------------
+// Cursor (need to do something about the vendor prefixes)
+//------------------------------------------------------------------------
+@-webkit-keyframes phase {
+  0%   { @include opacity(1); }
+  50%  { @include opacity(0); }
+  100% { @include opacity(1); }
+}
+@-webkit-keyframes shake {
+  0%   { margin-left: -2px; }
+  25%  { margin-left:  2px; }
+  50%  { margin-left: -2px; }
+  75%  { margin-left:  2px; }
+  100% { margin-left:    0; }
+}
+.cursor {
+  @include inline-block;
+  background: $color-ocean-blue;
+  width: 5px;
+  height: 25px;
+  position: absolute;
+  z-index: 0;
+  -webkit-animation: phase 1s linear infinite;
+
+  &.error {
+    background: $color-crescent-red;
+    -webkit-animation: shake 0.2s linear;
+  }
+}
+
+//------------------------------------------------------------------------
+// Info pane
+//------------------------------------------------------------------------
+.info-pane {
+  @include opacity(0.2);
+  @include transition($transition-speed);
+  font-family: "Inconsolata", Menlo, sans-serif;
+  font-size: 2em;
+  display: block;
+  width: 100%;
+  position: fixed;
+  left: 100px;
+  bottom: 50px;
+
+  &:hover {
+    @include opacity(1);
+  }
+}
+
+
