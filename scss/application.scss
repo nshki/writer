@@ -13,79 +13,54 @@ html, body {
   height: 100%;
 }
 body {
-  background: $color-white;
+  background: darken($color-white, 1%);
   font-family: $font-face-primary;
   font-size: $font-size-base;
   color: $color-black;
 }
 
 //------------------------------------------------------------------------
-// Canvas and characters
+// Canvas and descendents
 //------------------------------------------------------------------------
 .canvas {
+  @include opacity(0.3);
+  @include transition($transition-speed);
   @include box-sizing(border-box);
-  background: $color-white;
+  background: darken($color-white, 1%);
   line-height: 1;
-  font-family: "Inconsolata", Menlo, sans-serif;
+  font-family: $font-face-primary;
   font-size: 2em;
   width: 100%;
   height: 100%;
   position: relative;
   padding: 50px 100px;
+  cursor: text;
 
+  &.focus {
+    @include opacity(1);
+
+    .cursor {
+      -webkit-animation: phase 1s linear infinite;
+    }
+  }
   .character {
     @include inline-block;
     position: relative;
     z-index: 1;
+    margin: 3px 0;
   }
-}
+  .cursor {
+    @include inline-block;
+    background: $color-ocean-blue;
+    width: 5px;
+    position: relative;
+    z-index: 0;
+    margin-right: -5px; // mirror width
 
-//------------------------------------------------------------------------
-// Cursor (need to do something about the vendor prefixes)
-//------------------------------------------------------------------------
-@-webkit-keyframes phase {
-  0%   { @include opacity(1); }
-  50%  { @include opacity(0); }
-  100% { @include opacity(1); }
-}
-@-webkit-keyframes shake {
-  0%   { left: -2px; }
-  25%  { left:  2px; }
-  50%  { left: -2px; }
-  75%  { left:  2px; }
-  100% { left:  0px; }
-}
-.cursor {
-  @include inline-block;
-  background: $color-ocean-blue;
-  width: 5px;
-  position: relative;
-  z-index: 0;
-  margin-right: -5px; // mirror width
-  -webkit-animation: phase 1s linear infinite;
-
-  &.error {
-    background: $color-crescent-red;
-    -webkit-animation: shake 0.2s linear;
-  }
-}
-
-//------------------------------------------------------------------------
-// Info pane
-//------------------------------------------------------------------------
-.info-pane {
-  @include opacity(0.2);
-  @include transition($transition-speed);
-  font-family: "Inconsolata", Menlo, sans-serif;
-  font-size: 2em;
-  display: block;
-  width: 100%;
-  position: fixed;
-  left: 100px;
-  bottom: 50px;
-
-  &:hover {
-    @include opacity(1);
+    &.error {
+      background: $color-crescent-red;
+      -webkit-animation: shake 0.2s linear;
+    }
   }
 }
 

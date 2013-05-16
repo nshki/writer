@@ -3,13 +3,7 @@
 #========================================================================
 
 #------------------------------------------------------------------------
-# Get DOM elements and instantiate new Cursor object
+# Instantiate a new Canvas
 #------------------------------------------------------------------------
-canvas       = document.querySelector(".canvas")
-char_counter = document.querySelector(".char-counter")
-cursor       = document.querySelector(".cursor")
-
-cursor = new Cursor(cursor)
-cursor.set_canvas(canvas)
-
-infopane = new Infopane(canvas)
+canvas = document.querySelector(".canvas")
+canvas = new Canvas(canvas)
