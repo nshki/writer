@@ -36,11 +36,13 @@ class Cursor
   # Default constructor
   #----------------------------------------------------------------------
   constructor: (@canvas) ->
-    @el               = document.createElement("div")
-    @el.className     = "cursor"
-    @el.style.height  = @get_char_height() + "px"
+    cursor_offset       = 3
+    @pos                = 0
+    @el                 = document.createElement("div")
+    @el.className       = "cursor"
+    @el.style.height    = "#{@get_char_height()+cursor_offset}px"
+    @el.style.marginTop = "#{cursor_offset}px"
     @canvas.appendChild(@el)
-    @pos              = 0
 
   # Helper for constructor. Returns the height of a blank character.
   #----------------------------------------------------------------------
@@ -112,18 +114,30 @@ class Cursor
   # Move cursor down
   #----------------------------------------------------------------------
   move_down: () =>
-    # The first element* is the cursor itself, the second element is the
+    # The first element* is the cursor itself, the second element* is the
     # character that the cursor is on, and the third element is the
     # element we need to jump to.
     #
     # * Necessary to define "first element," as cursor can be on
     #   different lines. Defined as base_index below.
+    #
+    # * There is one exception to the second element being the character
+    #   the cursor is on, and this is when the cursor is at the end of
+    #   a line.
     col_els    = @get_col_els()
     base_index = col_els.indexOf(@el)
-    if col_els[base_index+2]
-      @canvas.insertBefore(@el, col_els[base_index+2])
-    else
-      @canvas.appendChild(@el)
+    if col_els[base_index+1]
+      # Compare with the difference between cursor top offset and the
+      # local cursor_offset value in the constructor.
+      if col_els[base_index+1].offsetTop == @el.offsetTop - 3
+        if col_els[base_index+2]
+          @canvas.insertBefore(@el, col_els[base_index+2])
+        else
+          @canvas.appendChild(@el)
+      else
+        # Handle special end-of-line cursor case
+        @canvas.insertBefore(@el, col_els[base_index+1])
+    else @canvas.appendChild(@el)
     @pos = @get_cursor_pos()
 
   # Move cursor up

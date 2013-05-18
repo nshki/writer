@@ -14,8 +14,8 @@ html, body {
 }
 body {
   background: darken($color-white, 1%);
-  font-family: $font-face-primary;
   font-size: $font-size-base;
+  font-family: $font-face-primary;
   color: $color-black;
 }
 
@@ -24,17 +24,17 @@ body {
 //------------------------------------------------------------------------
 .canvas {
   @include opacity(0.3);
-  @include transition($transition-speed);
   @include box-sizing(border-box);
+  @include transition($transition-speed);
   background: darken($color-white, 1%);
-  line-height: 1;
-  font-family: $font-face-primary;
+  line-height: 1.3;
   font-size: 2em;
+  font-family: $font-face-primary;
+  cursor: text;
   width: 100%;
   height: 100%;
   position: relative;
   padding: 50px 100px;
-  cursor: text;
 
   &.focus {
     @include opacity(1);
@@ -45,13 +45,14 @@ body {
   }
   .character {
     @include inline-block;
+    vertical-align: top;
     position: relative;
     z-index: 1;
-    margin: 3px 0;
   }
   .cursor {
     @include inline-block;
     background: $color-ocean-blue;
+    vertical-align: top;
     width: 5px;
     position: relative;
     z-index: 0;
