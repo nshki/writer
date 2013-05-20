@@ -74,6 +74,7 @@ class Cursor
   # Creates a new character element based on the ASCII value passed
   #----------------------------------------------------------------------
   type: (_char) =>
+    window.getSelection().collapse()
     char           = document.createElement("div")
     char.className = "character"
     char.innerHTML = _char
