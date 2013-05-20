@@ -13,6 +13,7 @@ class Canvas
   constructor: (@el) ->
     @base_class       = "canvas transition"
     @el.className     = @base_class
+    @el.onpaste       = @paste_listener
     @cursor           = new Cursor(@el)
     window.onkeydown  = @keydown_listener
     window.onkeypress = @keypress_listener
@@ -47,6 +48,13 @@ class Canvas
   #----------------------------------------------------------------------
   blur_listener: (e) =>
     @el.className = @base_class
+
+  # Handle paste
+  #----------------------------------------------------------------------
+  paste_listener: (e) =>
+    paste_text = e.clipboardData.getData("text/plain")
+    for i in [0...paste_text.length]
+      @cursor.type(paste_text[i])
 
 #------------------------------------------------------------------------
 # Cursor controls the behavior of the blinking I-beam. Any typing or
