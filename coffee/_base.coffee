@@ -11,6 +11,8 @@ class Canvas
   # Default constructor
   #----------------------------------------------------------------------
   constructor: (@el) ->
+    @base_class       = "canvas transition"
+    @el.className     = @base_class
     @cursor           = new Cursor(@el)
     window.onkeydown  = @cursor.keydown_listener
     window.onkeypress = @cursor.keypress_listener
@@ -20,12 +22,12 @@ class Canvas
   # Fade in on focus
   #----------------------------------------------------------------------
   focus_listener: (e) =>
-    @el.className = "canvas focus"
+    @el.className = "#{@base_class} focus"
 
   # Fade out on blur
   #----------------------------------------------------------------------
   blur_listener: (e) =>
-    @el.className = "canvas"
+    @el.className = @base_class
 
 #------------------------------------------------------------------------
 # Cursor controls the behavior of the blinking I-beam. Any typing or
@@ -36,12 +38,10 @@ class Cursor
   # Default constructor
   #----------------------------------------------------------------------
   constructor: (@canvas) ->
-    cursor_offset       = 3
-    @pos                = 0
-    @el                 = document.createElement("div")
-    @el.className       = "cursor"
-    @el.style.height    = "#{@get_char_height()+cursor_offset}px"
-    @el.style.marginTop = "#{cursor_offset}px"
+    @pos             = 0
+    @el              = document.createElement("div")
+    @el.className    = "cursor"
+    @el.style.height = @get_char_height() + "px"
     @canvas.appendChild(@el)
 
   # Helper for constructor. Returns the height of a blank character.
@@ -55,9 +55,7 @@ class Cursor
 
     # Calculate total box model height
     char_comp   = document.defaultView.getComputedStyle(char, "")
-    char_height = char.offsetHeight +
-                  parseInt(char_comp.getPropertyValue("margin-top")) +
-                  parseInt(char_comp.getPropertyValue("margin-bottom"))
+    char_height = char.offsetHeight
 
     # Remove blank character and return the height
     @canvas.removeChild(char)
@@ -127,9 +125,8 @@ class Cursor
     col_els    = @get_col_els()
     base_index = col_els.indexOf(@el)
     if col_els[base_index+1]
-      # Compare with the difference between cursor top offset and the
-      # local cursor_offset value in the constructor.
-      if col_els[base_index+1].offsetTop == @el.offsetTop - 3
+      # Compare with the difference between cursor top offset
+      if col_els[base_index+1].offsetTop == @el.offsetTop
         if col_els[base_index+2]
           @canvas.insertBefore(@el, col_els[base_index+2])
         else

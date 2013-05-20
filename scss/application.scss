@@ -18,6 +18,9 @@ body {
   font-family: $font-face-primary;
   color: $color-black;
 }
+.transition {
+  @include transition($transition-speed);
+}
 
 //------------------------------------------------------------------------
 // Canvas and descendents
@@ -25,7 +28,6 @@ body {
 .canvas {
   @include opacity(0.3);
   @include box-sizing(border-box);
-  @include transition($transition-speed);
   background: darken($color-white, 1%);
   line-height: 1.3;
   font-size: 2em;
