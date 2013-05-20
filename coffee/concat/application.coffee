@@ -14,10 +14,29 @@ class Canvas
     @base_class       = "canvas transition"
     @el.className     = @base_class
     @cursor           = new Cursor(@el)
-    window.onkeydown  = @cursor.keydown_listener
-    window.onkeypress = @cursor.keypress_listener
+    window.onkeydown  = @keydown_listener
+    window.onkeypress = @keypress_listener
     window.onfocus    = @focus_listener
     window.onblur     = @blur_listener
+
+  # Handle action keys
+  #----------------------------------------------------------------------
+  keydown_listener: (e) =>
+    switch e.which
+      when 8  then @cursor.delete(e)
+      when 13 then @cursor.enter()
+      when 32 then @cursor.spacebar()
+      when 37 then @cursor.move_left()
+      when 38 then @cursor.move_up()
+      when 39 then @cursor.move_right()
+      when 40 then @cursor.move_down()
+
+  # Handle typed characters
+  #----------------------------------------------------------------------
+  keypress_listener: (e) =>
+    if e.which != 13 and e.which != 32
+      char = String.fromCharCode(e.which)
+      @cursor.type(char)
 
   # Fade in on focus
   #----------------------------------------------------------------------
@@ -44,33 +63,19 @@ class Cursor
     @el.style.height = @get_char_height() + "px"
     @canvas.appendChild(@el)
 
-  # Helper for constructor. Returns the height of a blank character.
+  # Creates a new character element based on the ASCII value passed
   #----------------------------------------------------------------------
-  get_char_height: () =>
-    # Create new blank character
+  type: (_char) =>
     char           = document.createElement("div")
     char.className = "character"
-    char.innerHTML = "&nbsp;"
-    @canvas.appendChild(char)
+    char.innerHTML = _char
+    @canvas.insertBefore(char, @el)
+    @pos += 1
 
-    # Calculate total box model height
-    char_comp   = document.defaultView.getComputedStyle(char, "")
-    char_height = char.offsetHeight
-
-    # Remove blank character and return the height
-    @canvas.removeChild(char)
-    char_height
-
-  # Delete character located left of cursor
+  # Duplicate standard spacebar behavior
   #----------------------------------------------------------------------
-  delete: (e) =>
-    e.preventDefault()
-    before_cursor = @canvas.children[@pos-1]
-
-    if before_cursor
-      @pos -= 1
-      @canvas.removeChild(before_cursor)
-    else @error()
+  spacebar: () =>
+    @type("&nbsp;")
 
   # Duplicate standard return / enter behavior
   #----------------------------------------------------------------------
@@ -79,6 +84,46 @@ class Cursor
     newline           = document.createElement("br")
     newline.className = "newline"
     @canvas.insertBefore(newline, @el)
+
+  # Delete character located left of cursor
+  #----------------------------------------------------------------------
+  delete: (e) =>
+    e.preventDefault()
+    selection = window.getSelection()
+
+    # The Selection API has a rangeCount property, but for some reason
+    # it returned a 1 when there was nothing selected, so checking the
+    # length of the toString() is a way around this.
+    if selection.toString().length == 0
+      before_cursor = @canvas.children[@pos-1]
+      if before_cursor
+        @pos -= 1
+        @canvas.removeChild(before_cursor)
+      else @error()
+    else
+      range      = selection.getRangeAt(0)
+      range_head = range.startContainer.parentNode
+      range_tail = range.endContainer.parentNode
+
+      # If the cursor is not at the end of the selection, position the
+      # cursor so that it is.
+      if range_tail != @canvas
+        @canvas.insertBefore(@el, range_tail)
+        @pos = @get_cursor_pos()
+        @move_right()
+
+      # Delete until the selection is gone
+      canvas_els      = Array.prototype.slice.call(@canvas.children)
+      head_pos        = canvas_els.indexOf(range_head)
+      times_to_delete = @pos - head_pos
+      before_cursor   = @canvas.children[@pos-1]
+      for i in [1..times_to_delete]
+        @pos -= 1
+        @canvas.removeChild(before_cursor)
+        before_cursor = @canvas.children[@pos-1]
+
+      # Clear the selection
+      selection.collapse()
 
   # Move cursor left
   #----------------------------------------------------------------------
@@ -151,6 +196,30 @@ class Cursor
         @canvas.insertBefore(@el, @canvas.children[0])
     @pos = @get_cursor_pos()
 
+  # Behavior on error
+  #----------------------------------------------------------------------
+  error: () =>
+    @el.className = "cursor error"
+    el = @el
+    setTimeout ->
+      el.className = "cursor"
+    , 500
+
+  # Helper for constructor. Returns the height of a blank character.
+  #----------------------------------------------------------------------
+  get_char_height: () =>
+    # Create new blank character
+    char           = document.createElement("div")
+    char.className = "character"
+    char.innerHTML = "&nbsp;"
+    @canvas.appendChild(char)
+
+    # Calculate total box model height, then remove the blank character
+    # and return the height.
+    char_height = char.offsetHeight
+    @canvas.removeChild(char)
+    char_height
+
   # Helper for move_down() and move_up(). Store and return an array of
   # elements that have the same left offset as the cursor.
   #----------------------------------------------------------------------
@@ -167,37 +236,6 @@ class Cursor
   get_cursor_pos: () =>
     canvas_els = Array.prototype.slice.call(@canvas.children)
     canvas_els.indexOf(@el)
-
-  # Behavior on error
-  #----------------------------------------------------------------------
-  error: () =>
-    @el.className = "cursor error"
-    el = @el
-    setTimeout ->
-      el.className = "cursor"
-    , 500
-
-  # Handle action keys
-  #----------------------------------------------------------------------
-  keydown_listener: (e) =>
-    switch e.which
-      when 8  then @delete(e)
-      when 37 then @move_left()
-      when 38 then @move_up()
-      when 39 then @move_right()
-      when 40 then @move_down()
-      when 13 then @enter()
-
-  # Handle typed characters
-  #----------------------------------------------------------------------
-  keypress_listener: (e) =>
-    return if e.which == 13
-    char           = document.createElement("div")
-    char.className = "character"
-    char.innerHTML = String.fromCharCode(e.which)
-    char.innerHTML = "&nbsp;" if char.innerHTML == " "
-    @canvas.insertBefore(char, @el)
-    @pos += 1
 
 #========================================================================
 # main.coffee
