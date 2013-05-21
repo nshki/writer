@@ -7,6 +7,12 @@ An iA Writer-inspired minimal writing app.
 
 A demo of the latest build is available here: http://nikiliu.github.io/writer/
 
+## Purpose
+
+This project is a Web interpretation of iA Writer's philosophy of "Keep your hands
+on the keyboard and your mind in the text." Through subtle visual cues and animations,
+this project aims to make writing text an enjoyable experience.
+
 ## General Approach
 
 Browsers currently do not support the styling of I-beams within text input fields
