@@ -11,26 +11,15 @@ class Canvas
   # Default constructor
   #----------------------------------------------------------------------
   constructor: (@el) ->
-    @base_class       = "canvas transition"
+    @base_class       = "canvas transition focus"
     @el.className     = @base_class
     @el.onpaste       = @paste_listener
     @cursor           = new Cursor(@el)
-    window.onkeydown  = @keydown_listener
     window.onkeypress = @keypress_listener
+    window.onkeydown  = @keydown_listener
+    window.onkeyup    = @keyup_listener
     window.onfocus    = @focus_listener
     window.onblur     = @blur_listener
-
-  # Handle action keys
-  #----------------------------------------------------------------------
-  keydown_listener: (e) =>
-    switch e.which
-      when 8  then @cursor.delete(e)
-      when 13 then @cursor.enter()
-      when 32 then @cursor.spacebar()
-      when 37 then @cursor.move_left()
-      when 38 then @cursor.move_up()
-      when 39 then @cursor.move_right()
-      when 40 then @cursor.move_down()
 
   # Handle typed characters
   #----------------------------------------------------------------------
@@ -38,6 +27,19 @@ class Canvas
     if e.which != 13 and e.which != 32
       char = String.fromCharCode(e.which)
       @cursor.type(char)
+
+  # Handle action keys
+  #----------------------------------------------------------------------
+  keydown_listener: (e) =>
+    switch e.which
+      when 8  then @cursor.delete(e)
+      when 9  then @cursor.tab(e)
+      when 13 then @cursor.enter()
+      when 32 then @cursor.spacebar()
+      when 37 then @cursor.move_left()
+      when 38 then @cursor.move_up()
+      when 39 then @cursor.move_right()
+      when 40 then @cursor.move_down()
 
   # Fade in on focus
   #----------------------------------------------------------------------
@@ -66,6 +68,7 @@ class Cursor
   #----------------------------------------------------------------------
   constructor: (@canvas) ->
     @pos             = 0
+    @tab_size        = 4
     @el              = document.createElement("div")
     @el.className    = "cursor"
     @el.style.height = @get_char_height() + "px"
@@ -80,6 +83,12 @@ class Cursor
     char.innerHTML = _char
     @canvas.insertBefore(char, @el)
     @pos += 1
+
+  # Tabs x spaces, where x is defined as an instance variable
+  #----------------------------------------------------------------------
+  tab: (e) =>
+    e.preventDefault()
+    @spacebar() for i in [0...@tab_size]
 
   # Duplicate standard spacebar behavior
   #----------------------------------------------------------------------
