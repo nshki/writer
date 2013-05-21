@@ -54,4 +54,7 @@ class Canvas
   paste_listener: (e) =>
     paste_text = e.clipboardData.getData("text/plain")
     for i in [0...paste_text.length]
-      @cursor.type(paste_text[i])
+      if paste_text[i] == " "
+        @cursor.spacebar()
+      else
+        @cursor.type(paste_text[i])
