@@ -11,8 +11,8 @@ class Canvas
   # Default constructor
   #----------------------------------------------------------------------
   constructor: (@el) ->
-    @base_class       = "canvas transition focus"
-    @el.className     = @base_class
+    @base_class       = "canvas transition"
+    @el.className     = "#{@base_class} focus"
     @el.onpaste       = @paste_listener
     @cursor           = new Cursor(@el)
     window.onkeypress = @keypress_listener
