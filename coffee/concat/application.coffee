@@ -88,6 +88,7 @@ class Cursor
   #----------------------------------------------------------------------
   tab: (e) =>
     e.preventDefault()
+    window.getSelection().collapse()
     @spacebar() for i in [0...@tab_size]
 
   # Duplicate standard spacebar behavior
@@ -98,6 +99,7 @@ class Cursor
   # Duplicate standard return / enter behavior
   #----------------------------------------------------------------------
   enter: () =>
+    window.getSelection().collapse()
     @pos             += 1
     newline           = document.createElement("br")
     newline.className = "newline"
@@ -146,6 +148,7 @@ class Cursor
   # Move cursor left
   #----------------------------------------------------------------------
   move_left: () =>
+    window.getSelection().collapse()
     if @pos > 0
       previous_el = @canvas.children[@pos-1]
       @pos       -= 1
@@ -161,6 +164,7 @@ class Cursor
     #    0 1 2
     #
     # .insertBefore should be on element 2
+    window.getSelection().collapse()
     if @pos <= @canvas.children.length-2
       last_pos     = @pos == @canvas.children.length-2
       next_next_el = @canvas.children[@pos+2]
@@ -185,6 +189,7 @@ class Cursor
     # * There is one exception to the second element being the character
     #   the cursor is on, and this is when the cursor is at the end of
     #   a line.
+    window.getSelection().collapse()
     col_els    = @get_col_els()
     base_index = col_els.indexOf(@el)
     if col_els[base_index+1]
@@ -205,6 +210,7 @@ class Cursor
   move_up: () =>
     # The element directly before the cursor in the new array is the
     # element we need to jump to.
+    window.getSelection().collapse()
     col_els    = @get_col_els()
     base_index = col_els.indexOf(@el)
     if col_els[base_index-1]
