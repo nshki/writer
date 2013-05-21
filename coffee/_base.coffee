@@ -8,10 +8,11 @@
 #------------------------------------------------------------------------
 class Canvas
 
+  base_class: "canvas transition"
+
   # Default constructor
   #----------------------------------------------------------------------
   constructor: (@el) ->
-    @base_class       = "canvas transition"
     @el.className     = "#{@base_class} focus"
     @el.onpaste       = @paste_listener
     @cursor           = new Cursor(@el)
@@ -64,11 +65,12 @@ class Canvas
 #------------------------------------------------------------------------
 class Cursor
 
+  pos:      0
+  tab_size: 4
+
   # Default constructor
   #----------------------------------------------------------------------
   constructor: (@canvas) ->
-    @pos             = 0
-    @tab_size        = 4
     @el              = document.createElement("div")
     @el.className    = "cursor"
     @el.style.height = @get_char_height() + "px"
