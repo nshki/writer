@@ -36,7 +36,6 @@ and customize the behaviors that are normally available by default. These includ
 ## Development
 
 The app is written primarily in CoffeeScript. The `coffee/` directory contains the
-core of the app. `_base.coffee` contains classes and general code that is executed
-in `main.coffee`. Styling is done with Compass. Compilation and LiveReload are
-handled by [Guard](https://github.com/guard/guard).
+core of the app, and jQuery is not used. Styling is done with Compass. Compilation
+and LiveReload are handled by [Guard](https://github.com/guard/guard).
 
