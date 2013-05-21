@@ -5,7 +5,7 @@
 #------------------------------------------------------------------------
 # Watch, concatenate, and minify coffee
 #------------------------------------------------------------------------
-guard "concat", type:      "coffee", files:  %w(_base main),
+guard "concat", type:      "coffee", files:  %w(canvas cursor main),
                 input_dir: "coffee", output: "coffee/concat/application"
 guard "coffeescript", input: "coffee/concat", output: "js"
 guard "uglify", destination_file: "js/application.js" do

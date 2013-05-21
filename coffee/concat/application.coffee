@@ -1,11 +1,8 @@
 #========================================================================
-# _base.coffee
+# canvas.coffee
+#
+# Canvas manages high-level document activity.
 #========================================================================
-
-#------------------------------------------------------------------------
-# Canvas is instantiated on an element with class "canvas" and manages
-# the high-level document activity.
-#------------------------------------------------------------------------
 class Canvas
 
   base_class: "canvas transition"
@@ -59,10 +56,12 @@ class Canvas
     for i in [0...paste_text.length]
       @cursor.type(paste_text[i])
 
-#------------------------------------------------------------------------
+#========================================================================
+# cursor.coffee
+#
 # Cursor controls the behavior of the blinking I-beam. Any typing or
 # action keys / shortcuts respond to the methods defined by this class.
-#------------------------------------------------------------------------
+#========================================================================
 class Cursor
 
   pos:      0
