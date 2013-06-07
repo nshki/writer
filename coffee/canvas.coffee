@@ -56,5 +56,7 @@ class Canvas
     for i in [0...paste_text.length]
       if paste_text[i] == " "
         @cursor.spacebar()
+      else if paste_text[i] == "\n"
+        @cursor.enter()
       else
         @cursor.type(paste_text[i])

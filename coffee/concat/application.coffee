@@ -56,6 +56,8 @@ class Canvas
     for i in [0...paste_text.length]
       if paste_text[i] == " "
         @cursor.spacebar()
+      else if paste_text[i] == "\n"
+        @cursor.enter()
       else
         @cursor.type(paste_text[i])
 
@@ -196,17 +198,37 @@ class Cursor
     window.getSelection().collapse()
     col_els    = @get_col_els()
     base_index = col_els.indexOf(@el)
+
+    # If there is a next element, execute the if. Otherwise, move the
+    # cursor to the end.
     if col_els[base_index+1]
-      # Compare with the difference between cursor top offset
-      if col_els[base_index+1].offsetTop == @el.offsetTop
-        if col_els[base_index+2]
-          @canvas.insertBefore(@el, col_els[base_index+2])
-        else
-          @canvas.appendChild(@el)
+
+      # Define low_el to be the next element while handling the special
+      # case.
+      low_el = col_els[base_index+1]
+      low_el = col_els[base_index+2] if col_els[base_index+2]
+
+      # If the next element is more than two rows down, move the
+      # cursor to the next newline. Otherwise, move down normally.
+      if low_el.offsetTop > (@el.offsetTop + @el.offsetHeight)
+        cursor_pos = @pos
+        until @canvas.children[cursor_pos].className == "newline"
+          cursor_pos += 1
+        @canvas.insertBefore(@el, @canvas.children[cursor_pos+1])
+
+      # Move down normally. If at the last row, move to end.
       else
-        # Handle special end-of-line cursor case
-        @canvas.insertBefore(@el, col_els[base_index+1])
-    else @canvas.appendChild(@el)
+        if low_el.offsetTop == @el.offsetTop
+          @canvas.appendChild(@el)
+        else
+          @canvas.insertBefore(@el, low_el)
+
+    # Move the cursor to the end. If there is no end, error.
+    else
+      if @pos < @canvas.children.length-1
+        @canvas.appendChild(@el)
+      else @error()
+
     @pos = @get_cursor_pos()
 
   # Move cursor up
@@ -217,11 +239,33 @@ class Cursor
     window.getSelection().collapse()
     col_els    = @get_col_els()
     base_index = col_els.indexOf(@el)
+
+    # If there is an element directly above the cursor, execute the if
+    # branch. Otherwise, move the cursor to the beginning.
     if col_els[base_index-1]
-      @canvas.insertBefore(@el, col_els[base_index-1])
+
+      # If the element before the cursor is more than one row higher
+      # than the cursor, move the cursor to the end of the next highest
+      # row. Otherwise, move the cursor up normally.
+      high_el = col_els[base_index-1]
+      if high_el.offsetTop < (@el.offsetTop - @el.offsetHeight)
+
+        # Calculate position of the closest newline before the cursor
+        # and place the cursor before it.
+        cursor_pos = @pos
+        until @canvas.children[cursor_pos].className == "newline"
+          cursor_pos -= 1
+        @canvas.insertBefore(@el, @canvas.children[cursor_pos])
+
+      # Move cursor up normally
+      else @canvas.insertBefore(@el, col_els[base_index-1])
+
+    # Move cursor to the beginning. If there is no beginning, error.
     else
-      if @canvas.children[0]
+      if @pos > 0
         @canvas.insertBefore(@el, @canvas.children[0])
+      else @error()
+
     @pos = @get_cursor_pos()
 
   # Behavior on error

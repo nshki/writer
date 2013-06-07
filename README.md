@@ -24,15 +24,8 @@ not only the customization of the cursor, but also for individual letters as wel
 
 Because the app was designed as outlined above, all standard behavior for text
 inputs are no longer available by default. A majority of this project is to redefine
-and customize the behaviors that are normally available by default. These include:
+and customize the behaviors that are normally standardized across platforms. This allows for a completely different user experience when using Writer.
 
-  - Backspace
-  - Enter / return
-  - Tab
-  - Delete selection
-  - Paste text
-  - etc...
- 
 ## Development
 
 The app is written primarily in CoffeeScript. The `coffee/` directory contains the
