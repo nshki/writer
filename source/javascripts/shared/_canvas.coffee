@@ -1,9 +1,7 @@
-#========================================================================
-# canvas.coffee
-#
+#------------------------------------------------------------------------
 # Canvas manages high-level document activity.
-#========================================================================
-class Canvas
+#------------------------------------------------------------------------
+class window.Canvas
 
   base_class: "canvas transition"
 
@@ -12,7 +10,7 @@ class Canvas
   constructor: (@el) ->
     @el.className     = "#{@base_class} focus"
     @el.onpaste       = @paste_listener
-    @cursor           = new Cursor(@el)
+    @caret            = new Caret(@el)
     window.onkeypress = @keypress_listener
     window.onkeydown  = @keydown_listener
     window.onkeyup    = @keyup_listener
@@ -24,20 +22,20 @@ class Canvas
   keypress_listener: (e) =>
     if e.which != 13 and e.which != 32
       char = String.fromCharCode(e.which)
-      @cursor.type(char)
+      @caret.type(char)
 
   # Handle action keys
   #----------------------------------------------------------------------
   keydown_listener: (e) =>
     switch e.which
-      when 8  then @cursor.delete(e)
-      when 9  then @cursor.tab(e)
-      when 13 then @cursor.enter()
-      when 32 then @cursor.spacebar()
-      when 37 then @cursor.move_left()
-      when 38 then @cursor.move_up()
-      when 39 then @cursor.move_right()
-      when 40 then @cursor.move_down()
+      when 8  then @caret.delete(e)
+      when 9  then @caret.tab(e)
+      when 13 then @caret.enter()
+      when 32 then @caret.spacebar()
+      when 37 then @caret.move_left()
+      when 38 then @caret.move_up()
+      when 39 then @caret.move_right()
+      when 40 then @caret.move_down()
 
   # Fade in on focus
   #----------------------------------------------------------------------
@@ -55,8 +53,8 @@ class Canvas
     paste_text = e.clipboardData.getData("text/plain")
     for i in [0...paste_text.length]
       if paste_text[i] == " "
-        @cursor.spacebar()
+        @caret.spacebar()
       else if paste_text[i] == "\n"
-        @cursor.enter()
+        @caret.enter()
       else
-        @cursor.type(paste_text[i])
+        @caret.type(paste_text[i])
