@@ -4,34 +4,30 @@
 
 class window.Helpers   # Define properties and methods with @
 
-  # Custom version of the PHP wordwrap port by James Padolsey
-  # http://james.padolsey.com/javascript/wordwrap-for-javascript/
-  # http://us3.php.net/manual/en/function.wordwrap.php
-  # @param  str    - String to wrap
-  #         width  - Number of characters on a line
-  #         cut    - Boolean for cutting long words or not
-  # @return string - Modified string with breaks
-  @wordwrap: (str = "", width = 75, cut = false) =>
-    text    = str.replace(/<div class="character">/g, "")
-                 .replace(/<\/div>/g, "")
-                 .replace(/<br class="newline">/g, "\n")
-                 .replace(/&nbsp;/g, " ")
-                 .replace(/<div class="caret" style="height: 26px;">/g, "")
-    brk     = "\t"
-    pattern = `'.{1,' +width+ '}(\\s|$)' + (cut ? '|.{' +width+ '}|.+$' : '|\\S+?(\\s|$)')`
-    text    = text.match(new RegExp(pattern, "g")).join(brk)
+  # Inserts break elements between words in the canvas to rid of
+  # horizontal overflow.
+  # @param canvas - Canvas element
+  #----------------------------------------------------------------------
+  @wordwrap: (canvas) =>
+    chars     = 0
+    max_chars = Math.floor((canvas.offsetWidth-210)/10)
+    for i in [0...canvas.children.length]
+      el     = canvas.children[i]
+      chars += 1 if el.className == "character"
+      chars  = 0 if el.className == "newline"
 
-    # Reformat string to include correct <div> and <br> tags
-    wrapped = ""
-    for char in text
-      if char == "\t"
-        wrapped += "<br class='newline' />"
-      else
-        char     = "&nbsp;" if char == " "
-        wrapped += "<div class='character'>#{char}</div>"
+      # Once we count past the maximum number of characters, look back
+      # to find a space.
+      if chars > max_chars
+        for j in [i..0] by -1
 
-    # Return the formatted string
-    wrapped
+          # Once we find a space, insert a newline before and delete
+          space = canvas.children[j]
+          if space.innerHTML == "&nbsp;"
+            canvas.insertBefore(Elements.new_break(), space)
+            canvas.removeChild(space)
+            chars = 0
+            break
 
   # Adjust window scroll so that the caret is visible
   # @param canvas - Canvas element
@@ -39,18 +35,7 @@ class window.Helpers   # Define properties and methods with @
   #----------------------------------------------------------------------
   @ensure_visible: (canvas, caret) =>
     coords   = caret.get_coords()
-    hpadding = 90    # Less than .canvas padding-left
     vpadding = 50    # Less than .canvas padding-top + caret height
-
-    # Offscreen left
-    until coords[0]-canvas.scrollLeft >= hpadding
-      canvas.scrollLeft -= 10
-      coords             = caret.get_coords()
-
-    # Offscreen right
-    until coords[0]-canvas.scrollLeft <= window.innerWidth-hpadding
-      canvas.scrollLeft += 10
-      coords             = caret.get_coords()
 
     # Offscreen top
     until coords[1] >= canvas.scrollTop+vpadding
