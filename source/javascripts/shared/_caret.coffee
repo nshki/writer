@@ -117,11 +117,29 @@ class window.Caret
   # Move caret left to end of line
   # @param e - Event
   #----------------------------------------------------------------------
-  move_all_left: (e) =>
+  move_cmd_left: (e) =>
     e.preventDefault()
     left_pos = Helpers.get_left_count(@canvas, @pos)
     @move_left() for [0...left_pos]
     @el.className = "caret"
+
+  # Move caret left to previous word
+  # @param e - Event
+  #----------------------------------------------------------------------
+  move_alt_left: (e) =>
+    e.preventDefault()
+    prev_el = @canvas.children[@pos-1]
+    return if !prev_el   # Reached beginning of document
+
+    # Move left until we hit a character
+    until prev_el.innerHTML != "&nbsp;" and prev_el.className != "newline"
+      @move_left()
+      prev_el = @canvas.children[@pos-1]
+
+    # Move left until we hit a space or newline
+    until !prev_el or prev_el.innerHTML == "&nbsp;" or prev_el.className == "newline"
+      @move_left()
+      prev_el = @canvas.children[@pos-1]
 
   # Move caret right
   # @param  e       - Event
@@ -150,13 +168,31 @@ class window.Caret
   # Move caret right to end of line
   # @param e - Event
   #----------------------------------------------------------------------
-  move_all_right: (e) =>
+  move_cmd_right: (e) =>
     e.preventDefault()
     while true
       next_el = @canvas.children[@pos+1]
       if (next_el and next_el.className == "newline") or !@move_right()
         break
     @el.className = "caret"
+
+  # Move caret right to next word
+  # @param e - Event
+  #----------------------------------------------------------------------
+  move_alt_right: (e) =>
+    e.preventDefault()
+    next_el = @canvas.children[@pos+1]
+    return if !next_el   # Reached end of document
+
+    # Move right until we hit a character
+    until next_el.innerHTML != "&nbsp;" and next_el.className != "newline"
+      @move_right()
+      next_el = @canvas.children[@pos+1]
+
+    # Move right until we hit a space or newline
+    until !next_el or next_el.innerHTML == "&nbsp;" or next_el.className == "newline"
+      @move_right()
+      next_el = @canvas.children[@pos+1]
 
   # Move caret down
   # @param e - Event
@@ -180,7 +216,7 @@ class window.Caret
   # Move caret down to end of document
   # @param e - Event
   #----------------------------------------------------------------------
-  move_all_down: (e) =>
+  move_cmd_down: (e) =>
     e.preventDefault()
     while true
       break if !@move_right()
@@ -212,7 +248,7 @@ class window.Caret
   # Move caret up to beginning of document
   # @param e - Event
   #----------------------------------------------------------------------
-  move_all_up: (e) =>
+  move_cmd_up: (e) =>
     e.preventDefault()
     while true
       break if !@move_left()

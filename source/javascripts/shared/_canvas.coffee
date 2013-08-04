@@ -31,12 +31,18 @@ class window.Canvas
   #----------------------------------------------------------------------
   keydown_listener: (e) =>
     @keys[e.which] = true
-    if @keys[91] or @keys[93] or @keys[224] or @keys[17] or e.ctrlKey
+
+    # Detect command/ctrl
+    if @keys[91] or @keys[93] or @keys[224] or @keys[17]
       # 91, 93 => WebKit
       # 224    => Firefox
       # 17     => Opera
       cmd = true
     else cmd = false
+
+    # Detect alt
+    if @keys[18] then alt = true
+    else              alt = false
 
     # Will be true if any of the below keys are pressed
     exec = false
@@ -48,19 +54,21 @@ class window.Canvas
 
       # Arrow keys
       when 37
-        if cmd then @caret.move_all_left(e)
-        else        @caret.move_left(e)
+        if      cmd then @caret.move_cmd_left(e)
+        else if alt then @caret.move_alt_left(e)
+        else             @caret.move_left(e)
         exec = true
       when 38
-        if cmd then @caret.move_all_up(e)
+        if cmd then @caret.move_cmd_up(e)
         else        @caret.move_up(e)
         exec = true
       when 39
-        if cmd then @caret.move_all_right(e)
-        else        @caret.move_right(e)
+        if      cmd then @caret.move_cmd_right(e)
+        else if alt then @caret.move_alt_right(e)
+        else             @caret.move_right(e)
         exec = true
       when 40
-        if cmd then @caret.move_all_down(e)
+        if cmd then @caret.move_cmd_down(e)
         else        @caret.move_down(e)
         exec = true
 
@@ -70,7 +78,7 @@ class window.Canvas
   # Forget pressed keys
   #----------------------------------------------------------------------
   keyup_listener: (e) =>
-    @keys = {}
+    @keys[e.which] = false
 
   # Fade in on focus
   #----------------------------------------------------------------------
