@@ -26,6 +26,17 @@ class window.Caret
     @canvas.insertBefore(char, @el)
     @pos += 1
 
+    # Allow mouse clicks within document
+    char.onclick = (e) =>
+      @canvas.insertBefore(@el, char)
+      @pos = Helpers.get_caret_pos(@canvas, @el)
+
+      # If click was to the right of character, reposition caret
+      charW  = char.offsetWidth
+      charX  = char.offsetLeft
+      mouseX = e.pageX
+      @move_right() if mouseX > charX+(charW/2)
+
   # Tabs x spaces, where x is defined as an instance variable
   # @param e - Event
   #----------------------------------------------------------------------

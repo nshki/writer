@@ -2,5 +2,4 @@
 # Main
 #----------------------------------------------------------------
 
-canvas = document.querySelector(".canvas")
-canvas = new Canvas(canvas)
+new Canvas(Elements.canvas)
