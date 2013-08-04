@@ -18,6 +18,7 @@ class window.Canvas
     window.onkeyup    = @keyup_listener
     window.onfocus    = @focus_listener
     window.onblur     = @blur_listener
+    window.onresize   = @resize_listener
 
   # Handle typed characters
   #----------------------------------------------------------------------
@@ -105,3 +106,9 @@ class window.Canvas
         @caret.enter()
       else
         @caret.type(paste_text[i])
+
+  # Handle re-wordwrapping on window resize
+  #----------------------------------------------------------------------
+  resize_listener: () =>
+    Helpers.wordwrap(@el)
+    @caret.set_pos(Helpers.get_caret_pos(@el, @caret.el))

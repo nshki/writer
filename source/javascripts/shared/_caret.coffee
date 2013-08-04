@@ -20,9 +20,7 @@ class window.Caret
   # @param _char - ASCII character
   #----------------------------------------------------------------------
   type: (_char) =>
-    char           = document.createElement("div")
-    char.className = "character"
-    char.innerHTML = _char
+    char = Elements.new_char(_char)
     @canvas.insertBefore(char, @el)
     @pos += 1
 
@@ -31,11 +29,10 @@ class window.Caret
       @canvas.insertBefore(@el, char)
       @pos = Helpers.get_caret_pos(@canvas, @el)
 
-      # If click was to the right of character, reposition caret
-      charW  = char.offsetWidth
-      charX  = char.offsetLeft
-      mouseX = e.pageX
-      @move_right() if mouseX > charX+(charW/2)
+    # If horizontal overflow, word wrap
+    if @canvas.scrollWidth > @canvas.clientWidth
+      Helpers.wordwrap(@canvas)
+      @pos = Helpers.get_caret_pos(@canvas, @el)
 
   # Tabs x spaces, where x is defined as an instance variable
   # @param e - Event
@@ -54,9 +51,9 @@ class window.Caret
   # Duplicate standard return / enter behavior
   #----------------------------------------------------------------------
   enter: () =>
-    @pos             += 1
-    newline           = document.createElement("br")
-    newline.className = "newline"
+    @pos   += 1
+    newline = Elements.new_break()
+    newline.classList.add("enter")
     @canvas.insertBefore(newline, @el)
 
   # Delete character located left of caret
@@ -274,3 +271,8 @@ class window.Caret
   #----------------------------------------------------------------------
   get_coords: () =>
     return [@el.offsetLeft, @el.offsetTop]
+
+  # Set the position of the caret
+  # @param @pos - Integer value
+  #----------------------------------------------------------------------
+  set_pos: (@pos) =>

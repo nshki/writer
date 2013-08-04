@@ -4,24 +4,43 @@
 
 class window.Helpers   # Define properties and methods with @
 
+  # Inserts break elements between words in the canvas to rid of
+  # horizontal overflow.
+  # @param canvas - Canvas element
+  #----------------------------------------------------------------------
+  @wordwrap: (canvas) =>
+    chars     = 0
+    max_chars = Math.floor((canvas.offsetWidth-110)/10)
+    for i in [0...canvas.children.length]
+      el     = canvas.children[i]
+      chars += 1 if el.className == "character"
+      chars  = 0 if el.classList.contains("enter")
+
+      # Remove any newlines that weren't manually entered
+      if el.className == "newline"
+        canvas.insertBefore(Elements.new_char("&nbsp;"), el)
+        canvas.removeChild(el)
+
+      # Once we count past the maximum number of characters, look back
+      # to find a space.
+      if chars > max_chars
+        for j in [i..0] by -1
+
+          # Once we find a space, insert a newline before and delete
+          space = canvas.children[j]
+          if space.innerHTML == "&nbsp;"
+            canvas.insertBefore(Elements.new_break(), space)
+            canvas.removeChild(space)
+            chars = 0
+            break
+
   # Adjust window scroll so that the caret is visible
   # @param canvas - Canvas element
   #        caret  - Caret object
   #----------------------------------------------------------------------
   @ensure_visible: (canvas, caret) =>
     coords   = caret.get_coords()
-    hpadding = 90    # Less than .canvas padding-left
     vpadding = 50    # Less than .canvas padding-top + caret height
-
-    # Offscreen left
-    until coords[0]-canvas.scrollLeft >= hpadding
-      canvas.scrollLeft -= 10
-      coords             = caret.get_coords()
-
-    # Offscreen right
-    until coords[0]-canvas.scrollLeft <= window.innerWidth-hpadding
-      canvas.scrollLeft += 10
-      coords             = caret.get_coords()
 
     # Offscreen top
     until coords[1] >= canvas.scrollTop+vpadding
