@@ -10,11 +10,16 @@ class window.Helpers   # Define properties and methods with @
   #----------------------------------------------------------------------
   @wordwrap: (canvas) =>
     chars     = 0
-    max_chars = Math.floor((canvas.offsetWidth-210)/10)
+    max_chars = Math.floor((canvas.offsetWidth-110)/10)
     for i in [0...canvas.children.length]
       el     = canvas.children[i]
       chars += 1 if el.className == "character"
-      chars  = 0 if el.className == "newline"
+      chars  = 0 if el.classList.contains("enter")
+
+      # Remove any newlines that weren't manually entered
+      if el.className == "newline"
+        canvas.insertBefore(Elements.new_char("&nbsp;"), el)
+        canvas.removeChild(el)
 
       # Once we count past the maximum number of characters, look back
       # to find a space.
