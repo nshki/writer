@@ -41,12 +41,14 @@ class window.Caret
   # @param e - Event
   #----------------------------------------------------------------------
   tab: (e) =>
-    e.preventDefault()
+    e.preventDefault()   # Prevent default element focus
     @spacebar() for [0...@tab_size]
 
   # Duplicate standard spacebar behavior
+  # @param e - Event
   #----------------------------------------------------------------------
-  spacebar: () =>
+  spacebar: (e) =>
+    e.preventDefault()   # Prevent default scroll with space
     @type("&nbsp;")
 
   # Duplicate standard return / enter behavior
@@ -62,7 +64,7 @@ class window.Caret
   # @return boolean - True on success false on error
   #----------------------------------------------------------------------
   delete: (e) =>
-    e.preventDefault()
+    e.preventDefault()   # Prevent navigating back in browser
     selection = window.getSelection()
 
     # The Selection API has a rangeCount property, but for some reason
@@ -118,7 +120,7 @@ class window.Caret
   # @param e - Event
   #----------------------------------------------------------------------
   move_cmd_left: (e) =>
-    e.preventDefault()
+    e.preventDefault()   # Prevent browser navigation
     left_pos = Helpers.get_left_count(@canvas, @pos)
     @move_left() for [0...left_pos]
     @el.className = "caret"
@@ -170,7 +172,7 @@ class window.Caret
   # @param e - Event
   #----------------------------------------------------------------------
   move_cmd_right: (e) =>
-    e.preventDefault()
+    e.preventDefault()   # Prevent browser navigation
     while true
       next_el = @canvas.children[@pos+1]
       if (next_el and next_el.className == "newline") or !@move_right()

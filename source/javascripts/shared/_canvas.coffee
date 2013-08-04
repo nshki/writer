@@ -25,8 +25,8 @@ class window.Canvas
     if e.which != 13 and e.which != 32
       char = String.fromCharCode(e.which)
       @caret.type(char)
-      Helpers.ensure_visible(@el, @caret)
       window.getSelection().collapse()
+      Helpers.ensure_visible(@el, @caret)
 
   # Handle action keys
   #----------------------------------------------------------------------
@@ -48,10 +48,10 @@ class window.Canvas
     # Will be true if any of the below keys are pressed
     exec = false
     switch e.which
-      when 8  then @caret.delete(e);  exec = true
-      when 9  then @caret.tab(e);     exec = true
-      when 13 then @caret.enter();    exec = true
-      when 32 then @caret.spacebar(); exec = true
+      when 8  then @caret.delete(e);   exec = true
+      when 9  then @caret.tab(e);      exec = true
+      when 13 then @caret.enter();     exec = true
+      when 32 then @caret.spacebar(e); exec = true
 
       # Arrow keys
       when 37
@@ -73,7 +73,8 @@ class window.Canvas
         else        @caret.move_down(e)
         exec = true
 
-    # Clear selections and ensure caret visibility
+    # Clear selections and ensure caret visibility only if a defined
+    # caret action was performed.
     if exec == true
       window.getSelection().collapse()
       Helpers.ensure_visible(@el, @caret)
