@@ -25,6 +25,7 @@ class window.Canvas
     if e.which != 13 and e.which != 32
       char = String.fromCharCode(e.which)
       @caret.type(char)
+      Helpers.ensure_visible(@el, @caret)
       window.getSelection().collapse()
 
   # Handle action keys
@@ -72,8 +73,10 @@ class window.Canvas
         else        @caret.move_down(e)
         exec = true
 
-    # Clear selections
-    window.getSelection().collapse() if exec == true
+    # Clear selections and ensure caret visibility
+    if exec == true
+      window.getSelection().collapse()
+      Helpers.ensure_visible(@el, @caret)
 
   # Forget pressed keys
   #----------------------------------------------------------------------

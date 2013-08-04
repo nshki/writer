@@ -4,6 +4,35 @@
 
 class window.Helpers   # Define properties and methods with @
 
+  # Adjust window scroll so that the caret is visible
+  # @param canvas - Canvas element
+  #        caret  - Caret object
+  #----------------------------------------------------------------------
+  @ensure_visible: (canvas, caret) =>
+    coords   = caret.get_coords()
+    hpadding = 100   # Match .canvas padding-left
+    vpadding = 50    # Match .canvas padding-top
+
+    # Offscreen left
+    until coords[0]-canvas.scrollLeft >= hpadding
+      canvas.scrollLeft -= 1
+      coords             = caret.get_coords()
+
+    # Offscreen right
+    until coords[0]-canvas.scrollLeft <= window.innerWidth-hpadding
+      canvas.scrollLeft += 1
+      coords             = caret.get_coords()
+
+    # Offscreen top
+    until coords[1] >= canvas.scrollTop+vpadding
+      canvas.scrollTop -= 1
+      coords            = caret.get_coords()
+
+    # Offscreen bottom
+    until coords[1]-canvas.scrollTop <= window.innerHeight-vpadding
+      canvas.scrollTop += 1
+      coords            = caret.get_coords()
+
   # Get the pixel height of a blank character in the canvas
   # @param  canvas - Document canvas
   # @return int    - Pixel height of blank character

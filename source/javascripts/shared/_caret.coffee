@@ -137,7 +137,8 @@ class window.Caret
       prev_el = @canvas.children[@pos-1]
 
     # Move left until we hit a space or newline
-    until !prev_el or prev_el.innerHTML == "&nbsp;" or prev_el.className == "newline"
+    until !prev_el or prev_el.innerHTML == "&nbsp;" or
+                      prev_el.className == "newline"
       @move_left()
       prev_el = @canvas.children[@pos-1]
 
@@ -190,7 +191,8 @@ class window.Caret
       next_el = @canvas.children[@pos+1]
 
     # Move right until we hit a space or newline
-    until !next_el or next_el.innerHTML == "&nbsp;" or next_el.className == "newline"
+    until !next_el or next_el.innerHTML == "&nbsp;" or
+                      next_el.className == "newline"
       @move_right()
       next_el = @canvas.children[@pos+1]
 
@@ -264,3 +266,9 @@ class window.Caret
       el.className = "caret"
     , 500
     false
+
+  # Return x, y coordinates of caret
+  # @return array - [0] => x, [1] => y
+  #----------------------------------------------------------------------
+  get_coords: () =>
+    return [@el.offsetLeft, @el.offsetTop]
