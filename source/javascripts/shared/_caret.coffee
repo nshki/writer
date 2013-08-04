@@ -48,7 +48,7 @@ class window.Caret
   # @param e - Event
   #----------------------------------------------------------------------
   spacebar: (e) =>
-    e.preventDefault()   # Prevent default scroll with space
+    e.preventDefault() if e   # Prevent default scroll with space
     @type("&nbsp;")
 
   # Duplicate standard return / enter behavior
