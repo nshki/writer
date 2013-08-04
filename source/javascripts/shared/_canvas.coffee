@@ -12,6 +12,7 @@ class window.Canvas
     @el.className     = "#{@base_class} focus"
     @el.onpaste       = @paste_listener
     @caret            = new Caret(@el)
+    @keys             = {}
     window.onkeypress = @keypress_listener
     window.onkeydown  = @keydown_listener
     window.onkeyup    = @keyup_listener
@@ -28,16 +29,35 @@ class window.Canvas
   # Handle action keys
   #----------------------------------------------------------------------
   keydown_listener: (e) =>
+    @keys[e.which] = true
+
     switch e.which
       when 8  then @caret.delete(e)
       when 9  then @caret.tab(e)
       when 13 then @caret.enter()
       when 32 then @caret.spacebar()
-      when 37 then @caret.move_left()
-      when 38 then @caret.move_up()
-      when 39 then @caret.move_right()
-      when 40 then @caret.move_down()
+
+      # Arrow keys
+      when 37
+        if @keys[91] then @caret.move_all_left(e)
+        else              @caret.move_left(e)
+      when 38
+        if @keys[91] then @caret.move_all_up(e)
+        else              @caret.move_up(e)
+      when 39
+        if @keys[91] then @caret.move_all_right(e)
+        else              @caret.move_right(e)
+      when 40
+        if @keys[91] then @caret.move_all_down(e)
+        else              @caret.move_down(e)
+
+    # Clear selections
     window.getSelection().collapse()
+
+  # Forget pressed keys
+  #----------------------------------------------------------------------
+  keyup_listener: (e) =>
+    @keys = {}
 
   # Fade in on focus
   #----------------------------------------------------------------------

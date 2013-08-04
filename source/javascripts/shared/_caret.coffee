@@ -8,6 +8,7 @@ class window.Caret
   tab_size: 4
 
   # Default constructor
+  # @param canvas - HTML element
   #----------------------------------------------------------------------
   constructor: (@canvas) ->
     @el              = document.createElement("div")
@@ -16,6 +17,7 @@ class window.Caret
     @canvas.appendChild(@el)
 
   # Creates a new character element based on the ASCII value passed
+  # @param _char - ASCII character
   #----------------------------------------------------------------------
   type: (_char) =>
     char           = document.createElement("div")
@@ -25,6 +27,7 @@ class window.Caret
     @pos += 1
 
   # Tabs x spaces, where x is defined as an instance variable
+  # @param e - Event
   #----------------------------------------------------------------------
   tab: (e) =>
     e.preventDefault()
@@ -44,6 +47,7 @@ class window.Caret
     @canvas.insertBefore(newline, @el)
 
   # Delete character located left of caret
+  # @param  e       - Event
   # @return boolean - True on success false on error
   #----------------------------------------------------------------------
   delete: (e) =>
@@ -87,9 +91,11 @@ class window.Caret
       true
 
   # Move caret left
+  # @param  e       - Event
   # @return boolean - True on success, false on error
   #----------------------------------------------------------------------
-  move_left: () =>
+  move_left: (e) =>
+    e.preventDefault() if e
     if @pos > 0
       previous_el = @canvas.children[@pos-1]
       @pos       -= 1
@@ -97,16 +103,27 @@ class window.Caret
       true
     else @error()
 
+  # Move caret left to end of line
+  # @param e - Event
+  #----------------------------------------------------------------------
+  move_all_left: (e) =>
+    e.preventDefault()
+    left_pos = Helpers.get_left_count(@canvas, @pos)
+    @move_left() for [0...left_pos]
+    @el.className = "caret"
+
   # Move caret right
+  # @param  e       - Event
   # @return boolean - True on success, false on error
   #----------------------------------------------------------------------
-  move_right: () =>
+  move_right: (e) =>
     # Using -2 because:
     #
     #    | _ _
     #    0 1 2
     #
     # insertBefore() should be on element 2
+    e.preventDefault() if e
     if @pos <= @canvas.children.length-2
       last_pos     = @pos == @canvas.children.length-2
       next_next_el = @canvas.children[@pos+2]
@@ -119,28 +136,76 @@ class window.Caret
       true
     else @error()
 
-  # Move caret down
+  # Move caret right to end of line
+  # @param e - Event
   #----------------------------------------------------------------------
-  move_down: () =>
+  move_all_right: (e) =>
+    e.preventDefault()
+    while true
+      next_el = @canvas.children[@pos+1]
+      if (next_el and next_el.className == "newline") or !@move_right()
+        break
+    @el.className = "caret"
+
+  # Move caret down
+  # @param e - Event
+  #----------------------------------------------------------------------
+  move_down: (e) =>
+    e.preventDefault() if e
+    if !@canvas.children[@pos+1] then return @error()
     left_pos = Helpers.get_left_count(@canvas, @pos)
-    while @move_right()   # Account for error at end of document
+
+    # Position caret to beginning of next line. Using while-break to
+    # account for move error at end of document.
+    while @move_right()
       break if Helpers.get_left_count(@canvas, @pos) == 0
+
+    # Move caret to original left position unless we hit a newline
     for [0...left_pos]
       next_el = @canvas.children[@pos+1]
       @move_right() unless next_el and next_el.className == "newline"
+    @el.className = "caret"
+
+  # Move caret down to end of document
+  # @param e - Event
+  #----------------------------------------------------------------------
+  move_all_down: (e) =>
+    e.preventDefault()
+    while true
+      break if !@move_right()
+    @el.className = "caret"
 
   # Move caret up
+  # @param e - Event
   #----------------------------------------------------------------------
-  move_up: () =>
+  move_up: (e) =>
+    e.preventDefault() if e
+    if !@canvas.children[@pos-1] then return @error()
     left_pos = Helpers.get_left_count(@canvas, @pos)
-    if left_pos > 0        # Prevent skipping newlines
-      while @move_left()   # Account for error at beginning of document
+
+    # Position caret to beginning of previous line. Using while-break to
+    # account for move error at beginning of document. Checking if left
+    # position was positive to prevent skipping newlines.
+    if left_pos > 0
+      while @move_left()
         break if Helpers.get_left_count(@canvas, @pos) == 0
-    @move_left()           # Position caret at end of row above
-    row_count  = Helpers.get_left_count(@canvas, @pos)
-    move_count = row_count - left_pos
+    @move_left()
+
+    # Move caret to original left position
+    line_count = Helpers.get_left_count(@canvas, @pos)
+    move_count = line_count - left_pos
     if move_count > 0
       @move_left() for [0...move_count]
+    @el.className = "caret"
+
+  # Move caret up to beginning of document
+  # @param e - Event
+  #----------------------------------------------------------------------
+  move_all_up: (e) =>
+    e.preventDefault()
+    while true
+      break if !@move_left()
+    @el.className = "caret"
 
   # Behavior on error
   # @return boolean - False always
