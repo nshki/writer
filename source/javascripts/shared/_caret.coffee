@@ -59,6 +59,10 @@ class window.Caret
     newline.className = "newline"
     @canvas.insertBefore(newline, @el)
 
+    el                = @el
+    @canvas.innerHTML = Helpers.wordwrap(@canvas.innerHTML, 20)
+    @canvas.appendChild(el)
+
   # Delete character located left of caret
   # @param  e       - Event
   # @return boolean - True on success false on error

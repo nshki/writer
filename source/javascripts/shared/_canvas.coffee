@@ -77,7 +77,7 @@ class window.Canvas
     # caret action was performed.
     if exec == true
       window.getSelection().collapse()
-      Helpers.ensure_visible(@el, @caret)
+      # Helpers.ensure_visible(@el, @caret)
 
   # Forget pressed keys
   #----------------------------------------------------------------------
