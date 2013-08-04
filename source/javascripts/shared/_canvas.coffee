@@ -1,6 +1,7 @@
 #------------------------------------------------------------------------
-# Canvas manages high-level document activity.
+# Canvas
 #------------------------------------------------------------------------
+
 class window.Canvas
 
   base_class: "canvas transition"
@@ -36,6 +37,7 @@ class window.Canvas
       when 38 then @caret.move_up()
       when 39 then @caret.move_right()
       when 40 then @caret.move_down()
+    window.getSelection().collapse()
 
   # Fade in on focus
   #----------------------------------------------------------------------
