@@ -131,13 +131,13 @@ class window.Caret
     return if !prev_el   # Reached beginning of document
 
     # Move left until we hit a character
-    until prev_el.innerHTML != "&nbsp;" and prev_el.className != "newline"
+    until prev_el.innerHTML != "&nbsp;" and !prev_el.classList.contains("newline")
       @move_left()
       prev_el = @canvas.children[@pos-1]
 
     # Move left until we hit a space or newline
     until !prev_el or prev_el.innerHTML == "&nbsp;" or
-                      prev_el.className == "newline"
+                      prev_el.classList.contains("newline")
       @move_left()
       prev_el = @canvas.children[@pos-1]
 
@@ -185,13 +185,13 @@ class window.Caret
     return if !next_el   # Reached end of document
 
     # Move right until we hit a character
-    until next_el.innerHTML != "&nbsp;" and next_el.className != "newline"
+    until next_el.innerHTML != "&nbsp;" and !next_el.classList.contains("newline")
       @move_right()
       next_el = @canvas.children[@pos+1]
 
     # Move right until we hit a space or newline
     until !next_el or next_el.innerHTML == "&nbsp;" or
-                      next_el.className == "newline"
+                      next_el.classList.contains("newline")
       @move_right()
       next_el = @canvas.children[@pos+1]
 
