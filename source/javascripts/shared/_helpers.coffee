@@ -4,6 +4,38 @@
 
 class window.Helpers   # Define properties and methods with @
 
+  # Identifies current sentence/line and highlight it
+  # @param canvas - Canvas element
+  #        pos    - Caret integer position
+  #----------------------------------------------------------------------
+  @focus_mode: (canvas, pos) =>
+    delimiters = [".", "!", "?"]
+
+    # Clear all current elements
+    el.classList.remove("current") for el in canvas.children
+
+    # Find end of previous sentence
+    end_first = false
+    until !canvas.children[pos-1]
+      for delimiter in delimiters
+        if canvas.children[pos-1].innerHTML == delimiter
+          end_first = true
+          break
+      break if end_first
+      pos -= 1
+
+    # Mark every character till next delimiter
+    end_last = false
+    until !canvas.children[pos]
+      for delimiter in delimiters
+        if canvas.children[pos].innerHTML == delimiter
+          end_last = true
+          break
+      if !canvas.children[pos].classList.contains("caret")
+        canvas.children[pos].classList.add("current")
+      break if end_last
+      pos += 1
+
   # Inserts break elements between words in the canvas to rid of
   # horizontal overflow.
   # @param canvas - Canvas element
@@ -48,7 +80,7 @@ class window.Helpers   # Define properties and methods with @
       coords            = caret.get_coords()
 
     # Offscreen bottom
-    until coords[1]-canvas.scrollTop <= window.innerHeight-vpadding
+    until coords[1]-canvas.scrollTop <= canvas.offsetHeight-vpadding
       canvas.scrollTop += 10
       coords            = caret.get_coords()
 

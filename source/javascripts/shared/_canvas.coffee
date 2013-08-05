@@ -5,6 +5,8 @@
 class window.Canvas
 
   base_class: "canvas transition"
+  keys:       {}
+  focus_mode: false
 
   # Default constructor
   #----------------------------------------------------------------------
@@ -12,13 +14,18 @@ class window.Canvas
     @el.className     = "#{@base_class} focus"
     @el.onpaste       = @paste_listener
     @caret            = new Caret(@el)
-    @keys             = {}
     window.onkeypress = @keypress_listener
     window.onkeydown  = @keydown_listener
     window.onkeyup    = @keyup_listener
     window.onfocus    = @focus_listener
     window.onblur     = @blur_listener
-    window.onresize   = @resize_listener
+    window.onresize   = @resize_listener; @resize_listener()
+
+    Elements.focus_button.onclick = () =>
+      @focus_mode = !@focus_mode
+      @el.classList.toggle("focus-mode")
+      Elements.focus_button.classList.toggle("on")
+      Helpers.focus_mode(@el, @caret.pos) if @focus_mode
 
   # Handle typed characters
   #----------------------------------------------------------------------
@@ -28,6 +35,7 @@ class window.Canvas
       @caret.type(char)
       window.getSelection().collapse()
       Helpers.ensure_visible(@el, @caret)
+      Helpers.focus_mode(@el, @caret.pos) if @focus_mode
 
   # Handle action keys
   #----------------------------------------------------------------------
@@ -79,6 +87,7 @@ class window.Canvas
     if exec == true
       window.getSelection().collapse()
       Helpers.ensure_visible(@el, @caret)
+      Helpers.focus_mode(@el, @caret.pos)
 
   # Forget pressed keys
   #----------------------------------------------------------------------
@@ -89,6 +98,7 @@ class window.Canvas
   #----------------------------------------------------------------------
   focus_listener: (e) =>
     @el.className = "#{@base_class} focus"
+    @el.classList.add("focus_mode") if @focus_mode
 
   # Fade out on blur
   #----------------------------------------------------------------------
@@ -107,8 +117,10 @@ class window.Canvas
       else
         @caret.type(paste_text[i])
 
-  # Handle re-wordwrapping on window resize
+  # Handle re-wordwrapping and canvas resize on window resize
   #----------------------------------------------------------------------
   resize_listener: () =>
     Helpers.wordwrap(@el)
     @caret.set_pos(Helpers.get_caret_pos(@el, @caret.el))
+    @el.style.height = "#{window.innerHeight-Elements.canvas_menu.offsetHeight}px"
+

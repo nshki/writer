@@ -16,6 +16,38 @@ body
 .transition
   @include transition($transition-speed)
 
+// Canvas options --------------------------------------------------------
+
+.canvas-options
+  position: relative
+  z-index: 10
+  left: 0
+  bottom: 0
+  display: block
+  width: 100%
+  height: 40px
+  margin: 0
+  padding: 0
+  border-top: 1px solid darken($color-white, 15%)
+
+.focus-toggle
+  @include transition($transition-speed)
+  @include border-radius(1px)
+  @include box-shadow(0 0 2px lighten($color-black, 25%))
+  background: $color-white
+  color: transparent
+  position: absolute
+  left: 20px
+  bottom: 13px
+  display: block
+  width: 50px
+  border: none
+  border-right: 25px solid darken($color-white, 20%)
+
+  &.on
+    border-right: 0
+    border-left: 25px solid $color-ocean-blue
+
 // Canvas and descendents ------------------------------------------------
 
 .canvas
@@ -42,10 +74,17 @@ body
     .caret
       -webkit-animation: phase 1s linear infinite
 
+  &.focus-mode
+    color: darken($color-white, 25%)
+
+    .current
+      color: $color-black
+
   .newline
     font-size: 20px
 
   .character
+    @include transition($transition-speed)
     @include inline-block
     vertical-align: top
     font-size: 20px

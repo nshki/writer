@@ -8,6 +8,11 @@ class window.Elements   # Define properties and methods with @
   #----------------------------------------------------------------------
   @canvas: document.querySelector(".canvas")
 
+  # Menu elements
+  #----------------------------------------------------------------------
+  @canvas_menu:  document.querySelector(".canvas-options")
+  @focus_button: document.querySelector(".focus-toggle")
+
   # Returns a new character element
   # @param  ascii        - ASCII character
   # @return HTML element - New DOM object

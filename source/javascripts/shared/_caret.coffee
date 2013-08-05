@@ -4,8 +4,8 @@
 
 class window.Caret
 
-  pos:      0
-  tab_size: 4
+  pos:        0
+  tab_size:   4
 
   # Default constructor
   # @param canvas - HTML element
@@ -28,6 +28,7 @@ class window.Caret
     char.onclick = (e) =>
       @canvas.insertBefore(@el, char)
       @pos = Helpers.get_caret_pos(@canvas, @el)
+      Helpers.focus_mode(@canvas, @pos)
 
     # If horizontal overflow, word wrap
     if @canvas.scrollWidth > @canvas.clientWidth
