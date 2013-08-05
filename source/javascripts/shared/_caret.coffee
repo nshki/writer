@@ -219,9 +219,8 @@ class window.Caret
   #----------------------------------------------------------------------
   move_cmd_down: (e) =>
     e.preventDefault()
-    while true
-      break if !@move_right()
-    @el.className = "caret"
+    @canvas.appendChild(@el)
+    @pos = @canvas.children.length-1
 
   # Move caret up
   # @param e - Event
@@ -251,9 +250,14 @@ class window.Caret
   #----------------------------------------------------------------------
   move_cmd_up: (e) =>
     e.preventDefault()
-    while true
-      break if !@move_left()
-    @el.className = "caret"
+    if @canvas.children.length > 1
+      iterator  = 0
+      first_el  = @canvas.children[iterator]
+      until !first_el.classList.contains("caret")
+        iterator += 1
+        first_el  = @canvas.children[iterator]
+      @pos      = 0
+      @canvas.insertBefore(@el, first_el)
 
   # Behavior on error
   # @return boolean - False always
