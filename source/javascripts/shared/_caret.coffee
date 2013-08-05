@@ -172,7 +172,7 @@ class window.Caret
     e.preventDefault()   # Prevent browser navigation
     while true
       next_el = @canvas.children[@pos+1]
-      if (next_el and next_el.className == "newline") or !@move_right()
+      if (next_el and next_el.classList.contains("newline")) or !@move_right()
         break
     @el.className = "caret"
 
