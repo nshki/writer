@@ -45,8 +45,8 @@ class window.Helpers   # Define properties and methods with @
     max_chars = Math.floor((canvas.offsetWidth-110)/10)
     for i in [0...canvas.children.length]
       el     = canvas.children[i]
-      chars += 1 if el.className == "character"
-      chars  = 0 if el.classList.contains("enter")
+      chars += 1 if el.classList.contains("character")
+      chars  = 0 if el.classList.contains("newline")
 
       # Remove any newlines that weren't manually entered
       if el.className == "newline"
