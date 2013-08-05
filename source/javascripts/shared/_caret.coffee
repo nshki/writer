@@ -211,7 +211,7 @@ class window.Caret
     # Move caret to original left position unless we hit a newline
     for [0...left_pos]
       next_el = @canvas.children[@pos+1]
-      @move_right() unless next_el and next_el.className == "newline"
+      @move_right() unless next_el and next_el.classList.contains("newline")
     @el.className = "caret"
 
   # Move caret down to end of document

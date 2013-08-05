@@ -77,7 +77,7 @@ class window.Helpers   # Define properties and methods with @
   @get_left_count: (canvas, pos) ->
     counter = 0
     curr_el = canvas.children[pos-counter]
-    while curr_el and curr_el.className != "newline"
+    while curr_el and !curr_el.classList.contains("newline")
       counter += 1
       curr_el  = canvas.children[pos-counter]
     counter - 1   # Don't count the caret
