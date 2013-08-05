@@ -16,6 +16,20 @@ body
 .transition
   @include transition($transition-speed)
 
+// iOS keyboard ----------------------------------------------------------
+
+.ios-keyboard
+  @include opacity(0)
+  position: fixed
+  z-index: -1
+  left: -50%
+  top: 0
+  display: block
+  width: 200%
+  height: 100%
+  margin: 0
+  padding: 0
+
 // Canvas options --------------------------------------------------------
 
 .canvas-options

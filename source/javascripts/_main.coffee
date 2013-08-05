@@ -3,3 +3,4 @@
 #----------------------------------------------------------------
 
 new Canvas(Elements.canvas)
+Elements.ios_input.focus()

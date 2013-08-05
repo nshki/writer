@@ -8,6 +8,10 @@ class window.Elements   # Define properties and methods with @
   #----------------------------------------------------------------------
   @canvas: document.querySelector(".canvas")
 
+  # iOS keyboard
+  #----------------------------------------------------------------------
+  @ios_input: document.querySelector(".ios-keyboard")
+
   # Menu elements
   #----------------------------------------------------------------------
   @canvas_menu:  document.querySelector(".canvas-options")
