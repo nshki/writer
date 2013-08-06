@@ -4,15 +4,17 @@
 
 class window.Canvas
 
-  base_class: "canvas transition"
   keys:       {}
   focus_mode: false
 
   # Default constructor
+  # @param el - HTML element
   #----------------------------------------------------------------------
   constructor: (@el) ->
     @caret      = new Caret(@el)
+    @el.onclick = @click_listener
     @el.onpaste = @paste_listener
+    @el.classList.add("focus")
     @el.classList.add("transition")
 
     @create_menu()
@@ -65,29 +67,33 @@ class window.Canvas
   #----------------------------------------------------------------------
   wordwrap: () =>
     chars     = 0
-    max_chars = Math.floor((@el.offsetWidth-110)/10)
-    for i in [0...@el.children.length]
+    max_chars = parseInt((@el.offsetWidth-110)/10)
+
+    # Remove any newlines that weren't manually entered
+    for el in @el.children
+      if el.classList.contains("newline") and !el.classList.contains("enter")
+        @el.insertBefore(Caret.new_char("&nbsp;"), el)
+        @el.removeChild(el)
+
+    # Greedy algorithm for generating breaks for word wrap
+    i = 0
+    while i < @el.children.length
       el     = @el.children[i]
       chars += 1 if el.classList.contains("character")
       chars  = 0 if el.classList.contains("newline")
 
-      # Remove any newlines that weren't manually entered
-      if el.className == "newline"
-        @el.insertBefore(Caret.new_char("&nbsp;"), el)
-        @el.removeChild(el)
-
       # Once we count past the maximum number of characters, look back
-      # to find a space.
+      # to find a space. Once we find a space, insert a newline before it
+      # and delete.
       if chars > max_chars
-        for j in [i..0] by -1
-
-          # Once we find a space, insert a newline before and delete
-          space = @el.children[j]
-          if space.innerHTML == "&nbsp;"
-            @el.insertBefore(Caret.new_break(), space)
-            @el.removeChild(space)
-            chars = 0
-            break
+        char = @el.children[i]
+        until char.innerHTML == "&nbsp;"
+          i -= 1
+          char = @el.children[i]
+        @el.insertBefore(Caret.new_break(), char)
+        @el.removeChild(char)
+        chars = 0
+      i += 1
 
   # Identifies current sentence/line and highlight it
   # @param pos - Caret integer position
@@ -137,6 +143,7 @@ class window.Canvas
       coords         = @caret.get_coords()
 
   # Handle typed characters
+  # @param e - keypress event
   #----------------------------------------------------------------------
   keypress_listener: (e) =>
     if e.which != 13 and e.which != 32
@@ -145,6 +152,7 @@ class window.Canvas
 
       # If horizontal overflow, word wrap
       if @el.scrollWidth > @el.clientWidth
+        console.log "wrapping"
         @wordwrap()
         @caret.recalculate_pos()
 
@@ -153,6 +161,7 @@ class window.Canvas
       @highlight_sentence(@caret.pos) if @focus_mode
 
   # Handle action keys
+  # @param e - keydown event
   #----------------------------------------------------------------------
   keydown_listener: (e) =>
     @keys[e.which] = true
@@ -205,21 +214,31 @@ class window.Canvas
       @highlight_sentence(@caret.pos)
 
   # Forget pressed keys
+  # @param e - keyup event
   #----------------------------------------------------------------------
   keyup_listener: (e) =>
     @keys[e.which] = false
 
   # Fade in on focus
+  # @param e - focus event
   #----------------------------------------------------------------------
   focus_listener: (e) =>
     @el.classList.add("focus")
 
   # Fade out on blur
+  # @param e - blur event
   #----------------------------------------------------------------------
   blur_listener: (e) =>
     @el.classList.remove("focus")
 
+  # Handle click
+  # @param e - click event
+  #----------------------------------------------------------------------
+  click_listener: (e) =>
+    @highlight_sentence(@caret.pos)
+
   # Handle paste
+  # @param e - paste event
   #----------------------------------------------------------------------
   paste_listener: (e) =>
     paste_text = e.clipboardData.getData("text/plain")

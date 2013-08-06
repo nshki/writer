@@ -29,6 +29,11 @@ class window.Caret
       @canvas.insertBefore(@el, char)
       @recalculate_pos()
 
+      # Place cursor to left or right of clicked character, depending on
+      # click coordinates relative to character coordinates.
+      offset = @canvas.offsetLeft + char.offsetLeft
+      @move_right() if (offset+(char.offsetWidth/2)) < e.clientX
+
   # Tabs x spaces, where x is defined as an instance variable
   # @param e - Event
   #----------------------------------------------------------------------
@@ -266,7 +271,7 @@ class window.Caret
     false
 
   # Return x, y coordinates of caret
-  # @return array - [0] => x, [1] => y
+  # @return int array - [0] => x, [1] => y
   #----------------------------------------------------------------------
   get_coords: () =>
     return [@el.offsetLeft, @el.offsetTop]
