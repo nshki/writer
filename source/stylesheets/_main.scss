@@ -76,7 +76,7 @@ body {
 
     &.error {
       background: $color-crescent-red;
-      -webkit-animation: shake 0.2s linear;
+      -webkit-animation: shake 0.2s linear infinite;
     }
   }
 }

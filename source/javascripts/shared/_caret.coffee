@@ -292,11 +292,11 @@ class window.Caret
   # @return boolean - False always
   #----------------------------------------------------------------------
   error: () =>
-    @el.className = "caret error"
+    @el.classList.add("error")
     el = @el
     setTimeout ->
-      el.className = "caret"
-    , 500
+      el.classList.remove("error")
+    , 200
     false
 
   # Return x, y coordinates of caret
