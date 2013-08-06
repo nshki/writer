@@ -143,10 +143,12 @@ class window.Canvas
     if e.which != 13 and e.which != 32
       char = String.fromCharCode(e.which)
       @caret.type(char)
+
       @wordwrap() if @has_overflow()
-      window.getSelection().collapse()
       @ensure_visible()
       @highlight_sentence(@caret.pos) if @focus_mode
+
+      window.getSelection().collapse()
 
   # Detects if there is a horizontal overflow on the canvas
   # @return boolean - True if overflow, false otherwise
@@ -178,12 +180,15 @@ class window.Canvas
     # Will be true if any of the below keys are pressed
     exec = false
     switch e.which
+
+      # Delete
       when 8
         if      cmd then @caret.cmd_delete(e)
         else if alt then @caret.alt_delete(e)
         else             @caret.delete(e)
         exec = true
 
+      # Default special keys
       when 9  then @caret.tab(e);      exec = true
       when 13 then @caret.enter();     exec = true
       when 32 then @caret.spacebar(e); exec = true
@@ -213,7 +218,7 @@ class window.Canvas
     if exec == true
       window.getSelection().collapse()
       @ensure_visible()
-      @highlight_sentence(@caret.pos)
+      @highlight_sentence(@caret.pos) if @focus_mode
 
   # Forget pressed keys
   # @param e - keyup event
