@@ -13,27 +13,21 @@ class window.Caret
   constructor: (@canvas) ->
     @el              = document.createElement("div")
     @el.className    = "caret"
-    @el.style.height = Helpers.get_char_height(@canvas) + "px"
+    @el.style.height = Canvas.get_char_height(@canvas) + "px"
     @canvas.appendChild(@el)
 
   # Creates a new character element based on the ASCII value passed
   # @param _char - ASCII character
   #----------------------------------------------------------------------
   type: (_char) =>
-    char = Elements.new_char(_char)
+    char = Caret.new_char(_char)
     @canvas.insertBefore(char, @el)
     @pos += 1
 
     # Allow mouse clicks within document
     char.onclick = (e) =>
       @canvas.insertBefore(@el, char)
-      @pos = Helpers.get_caret_pos(@canvas, @el)
-      Helpers.focus_mode(@canvas, @pos)
-
-    # If horizontal overflow, word wrap
-    if @canvas.scrollWidth > @canvas.clientWidth
-      Helpers.wordwrap(@canvas)
-      @pos = Helpers.get_caret_pos(@canvas, @el)
+      @recalculate_pos()
 
   # Tabs x spaces, where x is defined as an instance variable
   # @param e - Event
@@ -53,7 +47,7 @@ class window.Caret
   #----------------------------------------------------------------------
   enter: () =>
     @pos   += 1
-    newline = Elements.new_break()
+    newline = Caret.new_break()
     newline.classList.add("enter")
     @canvas.insertBefore(newline, @el)
 
@@ -84,7 +78,7 @@ class window.Caret
       # caret so that it is.
       if range_tail != @canvas
         @canvas.insertBefore(@el, range_tail)
-        @pos = Helpers.get_caret_pos(@canvas, @el)
+        @recalculate_pos()
         @move_right()
 
       # Delete until the selection is gone
@@ -119,7 +113,7 @@ class window.Caret
   #----------------------------------------------------------------------
   move_cmd_left: (e) =>
     e.preventDefault()   # Prevent browser navigation
-    left_pos = Helpers.get_left_count(@canvas, @pos)
+    left_pos = @get_left_count()
     @move_left() for [0...left_pos]
     @el.className = "caret"
 
@@ -202,12 +196,12 @@ class window.Caret
   move_down: (e) =>
     e.preventDefault() if e
     if !@canvas.children[@pos+1] then return @error()
-    left_pos = Helpers.get_left_count(@canvas, @pos)
+    left_pos = @get_left_count()
 
     # Position caret to beginning of next line. Using while-break to
     # account for move error at end of document.
     while @move_right()
-      break if Helpers.get_left_count(@canvas, @pos) == 0
+      break if @get_left_count() == 0
 
     # Move caret to original left position unless we hit a newline
     for [0...left_pos]
@@ -229,18 +223,18 @@ class window.Caret
   move_up: (e) =>
     e.preventDefault() if e
     if !@canvas.children[@pos-1] then return @error()
-    left_pos = Helpers.get_left_count(@canvas, @pos)
+    left_pos = @get_left_count()
 
     # Position caret to beginning of previous line. Using while-break to
     # account for move error at beginning of document. Checking if left
     # position was positive to prevent skipping newlines.
     if left_pos > 0
       while @move_left()
-        break if Helpers.get_left_count(@canvas, @pos) == 0
+        break if @get_left_count() == 0
     @move_left()
 
     # Move caret to original left position
-    line_count = Helpers.get_left_count(@canvas, @pos)
+    line_count = @get_left_count()
     move_count = line_count - left_pos
     if move_count > 0
       @move_left() for [0...move_count]
@@ -277,7 +271,37 @@ class window.Caret
   get_coords: () =>
     return [@el.offsetLeft, @el.offsetTop]
 
-  # Set the position of the caret
-  # @param @pos - Integer value
+  # Get how many characters there are to the left of the caret
+  # @return int - Number of characters left of caret
   #----------------------------------------------------------------------
-  set_pos: (@pos) =>
+  get_left_count: () ->
+    counter = 0
+    curr_el = @canvas.children[@pos-counter]
+    while curr_el and !curr_el.classList.contains("newline")
+      counter += 1
+      curr_el  = @canvas.children[@pos-counter]
+    counter - 1   # Don't count the caret
+
+  # Recalculate the index position of the caret
+  #----------------------------------------------------------------------
+  recalculate_pos: () =>
+    canvas_els = Array.prototype.slice.call(@canvas.children)
+    @pos       = canvas_els.indexOf(@el)
+
+  # Returns a new character element
+  # @param  ascii        - ASCII character
+  # @return HTML element - New DOM object
+  #----------------------------------------------------------------------
+  @new_char: (ascii) =>
+    char           = document.createElement("div")
+    char.className = "character"
+    char.innerHTML = ascii
+    char
+
+  # Returns a new newline element
+  # @return HTML element - New DOM object
+  #----------------------------------------------------------------------
+  @new_break: () =>
+    newline           = document.createElement("br")
+    newline.className = "newline"
+    newline

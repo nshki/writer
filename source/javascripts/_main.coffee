@@ -2,5 +2,6 @@
 # Main
 #----------------------------------------------------------------
 
-new Canvas(Elements.canvas)
-Elements.ios_input.focus()
+# Instantiate a new canvas
+#----------------------------------------------------------------
+new Canvas(document.querySelector(".canvas"))

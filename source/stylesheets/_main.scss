@@ -32,9 +32,9 @@ body {
   padding: 0;
 }
 
-// Canvas options
+// Canvas menu
 //------------------------------------------------------------------------
-.canvas-options {
+.canvas-menu {
   position: relative;
   z-index: 10;
   left: 0;
@@ -57,6 +57,7 @@ body {
   bottom: 13px;
   display: block;
   width: 50px;
+  height: 15px;
   border: none;
   border-left: 0 solid transparent;
   border-right: 25px solid darken($color-white, 20%);
