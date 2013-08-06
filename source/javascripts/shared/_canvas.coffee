@@ -105,26 +105,22 @@ class window.Canvas
     el.classList.remove("current") for el in @el.children
 
     # Find end of previous sentence
-    end_first = false
-    until !@el.children[pos-1]
-      for delimiter in delimiters
-        if @el.children[pos-1].innerHTML == delimiter
-          end_first = true
-          break
-      break if end_first
-      pos -= 1
+    prev_it = @el.children[pos-1]
+    until !prev_it or delimiters.indexOf(prev_it.innerHTML) > -1 or
+                      prev_it.classList.contains("enter")
+      pos    -= 1
+      prev_it = @el.children[pos-1]
 
     # Mark every character till next delimiter
-    end_last = false
-    until !@el.children[pos]
-      for delimiter in delimiters
-        if @el.children[pos].innerHTML == delimiter
-          end_last = true
-          break
-      if !@el.children[pos].classList.contains("caret")
-        @el.children[pos].classList.add("current")
-      break if end_last
-      pos += 1
+    next_it = @el.children[pos]
+    until !next_it or delimiters.indexOf(next_it.innerHTML) > -1 or
+                      next_it.classList.contains("enter")
+      next_it.classList.add("current")
+      pos    += 1
+      next_it = @el.children[pos]
+
+    # Clear the caret of the current class
+    @caret.el.classList.remove("current")
 
   # Adjust window scroll so that the caret is visible
   #----------------------------------------------------------------------
