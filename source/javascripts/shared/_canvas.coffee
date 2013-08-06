@@ -143,18 +143,21 @@ class window.Canvas
     if e.which != 13 and e.which != 32
       char = String.fromCharCode(e.which)
       @caret.type(char)
-
-      @wordwrap() if @has_overflow()
-      @ensure_visible()
-      @highlight_sentence(@caret.pos) if @focus_mode
-
-      window.getSelection().collapse()
+      @normalize()
 
   # Detects if there is a horizontal overflow on the canvas
   # @return boolean - True if overflow, false otherwise
   #----------------------------------------------------------------------
   has_overflow: () =>
     @el.scrollWidth > @el.clientWidth
+
+  # Runs methods to keep the document in shape
+  #----------------------------------------------------------------------
+  normalize: () =>
+    @wordwrap() if @has_overflow()
+    @ensure_visible()
+    @highlight_sentence(@caret.pos) if @focus_mode
+    window.getSelection().collapse()
 
   # Handle action keys
   # @param e - keydown event
@@ -213,12 +216,7 @@ class window.Canvas
         else        @caret.move_down(e)
         exec = true
 
-    # Clear selections and ensure caret visibility only if a defined
-    # caret action was performed.
-    if exec == true
-      window.getSelection().collapse()
-      @ensure_visible()
-      @highlight_sentence(@caret.pos) if @focus_mode
+    @normalize() if exec == true
 
   # Forget pressed keys
   # @param e - keyup event
@@ -250,13 +248,11 @@ class window.Canvas
   #----------------------------------------------------------------------
   paste_listener: (e) =>
     paste_text = e.clipboardData.getData("text/plain")
-    for i in [0...paste_text.length]
-      if paste_text[i] == " "
-        @caret.spacebar()
-      else if paste_text[i] == "\n"
-        @caret.enter()
-      else
-        @caret.type(paste_text[i])
+    for char in paste_text
+      if      char == " "  then @caret.spacebar()
+      else if char == "\n" then @caret.enter()
+      else                      @caret.type(char)
+    @normalize()
 
   # Handle re-wordwrapping and canvas resize on window resize
   #----------------------------------------------------------------------
