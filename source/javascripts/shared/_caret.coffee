@@ -100,6 +100,35 @@ class window.Caret
       selection.collapse()
       true
 
+  # Delete line
+  # @param e - Event
+  #----------------------------------------------------------------------
+  cmd_delete: (e) =>
+    e.preventDefault()
+    prev_it = @canvas.children[@pos-1]
+    until !prev_it or prev_it.classList.contains("newline")
+      @delete(e)
+      prev_it = @canvas.children[@pos-1]
+
+  # Delete word
+  # @param e - Event
+  #----------------------------------------------------------------------
+  alt_delete: (e) =>
+    e.preventDefault()
+    prev_it = @canvas.children[@pos-1]
+
+    # Delete until we hit a valid character
+    until !prev_it or (prev_it.classList.contains("character") and
+                       prev_it.innerHTML != "&nbsp;")
+      @delete(e)
+      prev_it = @canvas.children[@pos-1]
+
+    # Delete until we hit a space or newline
+    until !prev_it or prev_it.innerHTML == "&nbsp;" or
+                      prev_it.classList.contains("newline")
+      @delete(e)
+      prev_it = @canvas.children[@pos-1]
+
   # Move caret left
   # @param  e       - Event
   # @return boolean - True on success, false on error

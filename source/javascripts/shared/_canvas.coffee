@@ -100,8 +100,6 @@ class window.Canvas
   #----------------------------------------------------------------------
   highlight_sentence: (pos) =>
     delimiters = [".", "!", "?"]
-
-    # Clear all current elements
     el.classList.remove("current") for el in @el.children
 
     # Find end of previous sentence
@@ -163,21 +161,29 @@ class window.Canvas
     @keys[e.which] = true
 
     # Detect command/ctrl
-    if @keys[91] or @keys[93] or @keys[224] or @keys[17]
-      # 91, 93 => WebKit
-      # 224    => Firefox
-      # 17     => Opera
-      cmd = true
-    else cmd = false
+    # 91, 93 => WebKit
+    # 224    => Firefox
+    # 17     => Opera
+    cmd = false
+    cmd = true if @keys[91] or @keys[93] or @keys[224] or @keys[17]
 
     # Detect alt
-    if @keys[18] then alt = true
-    else              alt = false
+    alt = false
+    alt = true if @keys[18]
+
+    # Detect shift
+    shift = false
+    shift = true if @keys[16]
 
     # Will be true if any of the below keys are pressed
     exec = false
     switch e.which
-      when 8  then @caret.delete(e);   exec = true
+      when 8
+        if      cmd then @caret.cmd_delete(e)
+        else if alt then @caret.alt_delete(e)
+        else             @caret.delete(e)
+        exec = true
+
       when 9  then @caret.tab(e);      exec = true
       when 13 then @caret.enter();     exec = true
       when 32 then @caret.spacebar(e); exec = true
