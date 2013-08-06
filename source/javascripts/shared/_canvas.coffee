@@ -271,7 +271,7 @@ class window.Canvas
   #----------------------------------------------------------------------
   @get_char_height: (canvas) =>
     # Create new blank character
-    char           = document.createElement("div")
+    char           = document.createElement("span")
     char.className = "character"
     char.innerHTML = "&nbsp;"
     canvas.appendChild(char)

@@ -327,7 +327,7 @@ class window.Caret
   # @return HTML element - New DOM object
   #----------------------------------------------------------------------
   @new_char: (ascii) =>
-    char           = document.createElement("div")
+    char           = document.createElement("span")
     char.className = "character"
     char.innerHTML = ascii
     char
