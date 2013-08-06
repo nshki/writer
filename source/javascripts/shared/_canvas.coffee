@@ -87,7 +87,7 @@ class window.Canvas
       # and delete.
       if chars > max_chars
         char = @el.children[i]
-        until char.innerHTML == "&nbsp;"
+        until char.classList.contains("space")
           i -= 1
           char = @el.children[i]
         @el.insertBefore(Caret.new_break(), char)

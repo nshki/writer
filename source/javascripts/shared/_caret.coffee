@@ -119,12 +119,12 @@ class window.Caret
 
     # Delete until we hit a valid character
     until !prev_it or (prev_it.classList.contains("character") and
-                       prev_it.innerHTML != "&nbsp;")
+                       !prev_it.classList.contains("space"))
       @delete(e)
       prev_it = @canvas.children[@pos-1]
 
     # Delete until we hit a space or newline
-    until !prev_it or prev_it.innerHTML == "&nbsp;" or
+    until !prev_it or prev_it.classList.contains("space") or
                       prev_it.classList.contains("newline")
       @delete(e)
       prev_it = @canvas.children[@pos-1]
@@ -160,12 +160,13 @@ class window.Caret
     return if !prev_el   # Reached beginning of document
 
     # Move left until we hit a character
-    until prev_el.innerHTML != "&nbsp;" and !prev_el.classList.contains("newline")
+    until !prev_el.classList.contains("space") and
+          !prev_el.classList.contains("newline")
       @move_left()
       prev_el = @canvas.children[@pos-1]
 
     # Move left until we hit a space or newline
-    until !prev_el or prev_el.innerHTML == "&nbsp;" or
+    until !prev_el or prev_el.classList.contains("space") or
                       prev_el.classList.contains("newline")
       @move_left()
       prev_el = @canvas.children[@pos-1]
@@ -214,12 +215,13 @@ class window.Caret
     return if !next_el   # Reached end of document
 
     # Move right until we hit a character
-    until next_el.innerHTML != "&nbsp;" and !next_el.classList.contains("newline")
+    until !next_el.classList.contains("space") and
+          !next_el.classList.contains("newline")
       @move_right()
       next_el = @canvas.children[@pos+1]
 
     # Move right until we hit a space or newline
-    until !next_el or next_el.innerHTML == "&nbsp;" or
+    until !next_el or next_el.classList.contains("space") or
                       next_el.classList.contains("newline")
       @move_right()
       next_el = @canvas.children[@pos+1]
@@ -328,8 +330,9 @@ class window.Caret
   #----------------------------------------------------------------------
   @new_char: (ascii) =>
     char           = document.createElement("span")
-    char.className = "character"
     char.innerHTML = ascii
+    char.classList.add("character")
+    char.classList.add("space") if ascii == "&nbsp;"
     char
 
   # Returns a new newline element
