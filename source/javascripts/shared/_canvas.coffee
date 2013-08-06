@@ -149,16 +149,16 @@ class window.Canvas
     if e.which != 13 and e.which != 32
       char = String.fromCharCode(e.which)
       @caret.type(char)
-
-      # If horizontal overflow, word wrap
-      if @el.scrollWidth > @el.clientWidth
-        console.log "wrapping"
-        @wordwrap()
-        @caret.recalculate_pos()
-
+      @wordwrap() if @has_overflow()
       window.getSelection().collapse()
       @ensure_visible()
       @highlight_sentence(@caret.pos) if @focus_mode
+
+  # Detects if there is a horizontal overflow on the canvas
+  # @return boolean - True if overflow, false otherwise
+  #----------------------------------------------------------------------
+  has_overflow: () =>
+    @el.scrollWidth > @el.clientWidth
 
   # Handle action keys
   # @param e - keydown event
@@ -224,6 +224,7 @@ class window.Canvas
   #----------------------------------------------------------------------
   focus_listener: (e) =>
     @el.classList.add("focus")
+    @keys = {}   # Fixes bug where alt/cmd are remembered on refocus
 
   # Fade out on blur
   # @param e - blur event
@@ -253,7 +254,7 @@ class window.Canvas
   # Handle re-wordwrapping and canvas resize on window resize
   #----------------------------------------------------------------------
   resize_listener: () =>
-    @wordwrap()
+    @wordwrap() if @has_overflow()
     @caret.recalculate_pos()
     @el.style.height = "#{window.innerHeight-@menu.offsetHeight}px"
 
