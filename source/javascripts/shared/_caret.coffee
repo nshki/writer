@@ -4,8 +4,8 @@
 
 class window.Caret
 
-  pos:        0
-  tab_size:   4
+  pos:      0
+  tab_size: 4
 
   # Default constructor
   # @param canvas - HTML element
