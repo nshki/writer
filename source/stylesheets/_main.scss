@@ -63,7 +63,7 @@ body {
     font-size: 20px;
     position: relative;
     z-index: 1;
-    -webkit-animation: type 0.2s linear;
+    // -webkit-animation: type 0.2s linear;
   }
   .caret {
     @include inline-block;
@@ -110,6 +110,7 @@ body {
   border: none;
   border-left: 0 solid transparent;
   border-right: 25px solid darken($color-white, 20%);
+  outline: none;
 
   &.on {
     border-right: 0 solid transparent;
