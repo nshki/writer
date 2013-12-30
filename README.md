@@ -8,10 +8,7 @@ An iA Writer-inspired writing app. http://nikiliu.github.io/writer/
 
 This project was a personal programming challenge -- after realizing
 there is no streamlined way of styling a caret (or I-beam) in an input
-area, why not implement a brand new one? The caret has potential to be
-a much more polished visual tool for a user. It could have subtle
-animations on illegal moves, it could blink in different ways, it
-could (insert imagination here), all while staying unobtrusive.
+area, I wanted to try implementing a textarea from scratch.
 
 
 ## Approach
@@ -33,6 +30,3 @@ wrap, and etc.
 Writer is built on [Middleman](http://middlemanapp.com/) and the
 [Sauce](http://github.com/nikiliu/sauce/) Middleman template. All of
 the functionality is written in [CoffeeScript](http://coffeescript.org/).
-
-The main files to look at are [_canvas.coffee](https://github.com/nikiliu/writer/blob/master/source/javascripts/shared/_canvas.coffee)
-and [_caret.coffee](https://github.com/nikiliu/writer/blob/master/source/javascripts/shared/_caret.coffee).
