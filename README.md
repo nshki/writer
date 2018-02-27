@@ -1,7 +1,7 @@
 writer
 ======
 
-An iA Writer-inspired writing app. http://nikiliu.github.io/writer/
+An iA Writer-inspired writing app. http://nshki.github.io/writer/
 
 
 ## Purpose
